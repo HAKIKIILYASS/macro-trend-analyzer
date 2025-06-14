@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,6 +17,7 @@ import MacroResults from '@/components/MacroResults';
 import DataVisualization from '@/components/DataVisualization';
 import ExportData from '@/components/ExportData';
 import SavedScores from '@/components/SavedScores';
+import DashboardSummary from '@/components/DashboardSummary';
 import { calculateMacroScore } from '@/utils/macroCalculations';
 import { saveScore } from '@/utils/scoreStorage';
 import { useToast } from '@/hooks/use-toast';

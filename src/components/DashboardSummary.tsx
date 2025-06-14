@@ -1,0 +1,187 @@
+
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Minus } from 'lucide-react';
+import { MacroData } from '@/pages/Index';
+
+interface DashboardSummaryProps {
+  data: MacroData;
+  results: {
+    scores: {
+      cb_score: number;
+      inflation_score: number;
+      labor_score: number;
+      risk_score: number;
+      pmi_score: number;
+      ca_score: number;
+      geo_score: number;
+    };
+    total_score: number;
+    bias: string;
+    biasColor: string;
+  } | null;
+}
+
+const DashboardSummary: React.FC<DashboardSummaryProps> = ({ data, results }) => {
+  const getTrendIcon = (score: number) => {
+    if (score > 0.3) return <TrendingUp className="w-4 h-4 text-green-600" />;
+    if (score < -0.3) return <TrendingDown className="w-4 h-4 text-red-600" />;
+    return <Minus className="w-4 h-4 text-gray-500" />;
+  };
+
+  const getStatusIcon = (score: number) => {
+    if (Math.abs(score) > 1) return <AlertTriangle className="w-4 h-4 text-orange-500" />;
+    if (score > 0.3) return <CheckCircle className="w-4 h-4 text-green-500" />;
+    return <Minus className="w-4 h-4 text-gray-400" />;
+  };
+
+  const keyMetrics = [
+    { 
+      label: 'Central Bank Policy', 
+      value: data.cb_hawkish_index.toFixed(2), 
+      unit: '',
+      score: results?.scores.cb_score || 0,
+      description: 'Hawkish Index'
+    },
+    { 
+      label: 'Inflation Rate', 
+      value: data.cpi.toFixed(1), 
+      unit: '%',
+      score: results?.scores.inflation_score || 0,
+      description: 'Current CPI'
+    },
+    { 
+      label: 'Labor Market', 
+      value: data.current_nfp.toString(), 
+      unit: 'K',
+      score: results?.scores.labor_score || 0,
+      description: 'NFP (000s)'
+    },
+    { 
+      label: 'Market Risk', 
+      value: data.vix.toFixed(0), 
+      unit: '',
+      score: results?.scores.risk_score || 0,
+      description: 'VIX Level'
+    }
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Executive Summary Card */}
+      <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+          <CardTitle className="text-xl font-bold flex items-center gap-2">
+            📊 Executive Dashboard Summary
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {keyMetrics.map((metric, index) => (
+              <div key={index} className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
+                <div className="flex justify-between items-start mb-2">
+                  <div className="text-sm text-gray-600 font-medium">{metric.label}</div>
+                  {getTrendIcon(metric.score)}
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {metric.value}{metric.unit}
+                </div>
+                <div className="text-xs text-gray-500">{metric.description}</div>
+                <div className="flex items-center gap-1 mt-2">
+                  {getStatusIcon(metric.score)}
+                  <span className={`text-xs font-medium ${
+                    metric.score > 0.3 ? 'text-green-600' : 
+                    metric.score < -0.3 ? 'text-red-600' : 'text-gray-500'
+                  }`}>
+                    Score: {metric.score > 0 ? '+' : ''}{metric.score.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {results && (
+            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Overall Market Bias</h3>
+                  <p className="text-sm text-gray-600">Based on comprehensive macro analysis</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold mb-1" style={{ color: results.biasColor }}>
+                    {results.total_score.toFixed(2)}
+                  </div>
+                  <Badge 
+                    className="text-sm px-3 py-1 font-semibold" 
+                    style={{ backgroundColor: results.biasColor, color: 'white' }}
+                  >
+                    {results.bias}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Key Insights */}
+      <Card className="border border-gray-200 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-t-lg">
+          <CardTitle className="text-lg font-semibold">
+            💡 Key Market Insights
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <h4 className="font-semibold text-gray-800">Economic Indicators</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <span className="text-sm">Inflation vs Target</span>
+                  <span className={`text-sm font-medium ${
+                    data.cpi > data.cpi_target ? 'text-red-600' : 'text-green-600'
+                  }`}>
+                    {data.cpi > data.cpi_target ? 'Above' : 'Below'} ({data.cpi_target}%)
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <span className="text-sm">PMI Status</span>
+                  <span className={`text-sm font-medium ${
+                    data.pmi > 50 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {data.pmi > 50 ? 'Expanding' : 'Contracting'} ({data.pmi})
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <h4 className="font-semibold text-gray-800">Risk Assessment</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <span className="text-sm">Market Volatility</span>
+                  <span className={`text-sm font-medium ${
+                    data.vix > 25 ? 'text-red-600' : data.vix > 15 ? 'text-orange-500' : 'text-green-600'
+                  }`}>
+                    {data.vix > 25 ? 'High' : data.vix > 15 ? 'Moderate' : 'Low'} ({data.vix})
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <span className="text-sm">Current Account</span>
+                  <span className={`text-sm font-medium ${
+                    data.ca_gdp < 0 ? 'text-red-600' : 'text-green-600'
+                  }`}>
+                    {data.ca_gdp < 0 ? 'Deficit' : 'Surplus'} ({data.ca_gdp}%)
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default DashboardSummary;
