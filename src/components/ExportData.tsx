@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MacroData } from '@/pages/Index';
-import { FileExport } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 interface ExportDataProps {
   data: MacroData;
@@ -66,7 +65,7 @@ const ExportData: React.FC<ExportDataProps> = ({ data, results }) => {
     <Card className="border border-slate-200">
       <CardHeader className="bg-slate-700 text-white">
         <CardTitle className="flex items-center gap-3">
-          <FileExport size={20} />
+          <FileText size={20} />
           Export Data
         </CardTitle>
       </CardHeader>
