@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Save } from 'lucide-react';
 import CentralBankInput from '@/components/CentralBankInput';
 import InflationInput from '@/components/InflationInput';
 import LaborMarketInput from '@/components/LaborMarketInput';
@@ -15,7 +15,10 @@ import GeopoliticalInput from '@/components/GeopoliticalInput';
 import MacroResults from '@/components/MacroResults';
 import DataVisualization from '@/components/DataVisualization';
 import ExportData from '@/components/ExportData';
+import SavedScores from '@/components/SavedScores';
 import { calculateMacroScore } from '@/utils/macroCalculations';
+import { saveScore } from '@/utils/scoreStorage';
+import { useToast } from '@/hooks/use-toast';
 
 export interface MacroData {
   cb_hawkish_index: number;
@@ -54,6 +57,8 @@ const Index = () => {
 
   const [results, setResults] = useState(null);
 
+  const { toast } = useToast();
+
   const updateData = (field: keyof MacroData, value: any) => {
     setData(prev => ({ ...prev, [field]: value }));
   };
@@ -61,6 +66,40 @@ const Index = () => {
   const calculateScores = () => {
     const calculatedResults = calculateMacroScore(data);
     setResults(calculatedResults);
+  };
+
+  const handleSaveScore = () => {
+    if (!results) {
+      toast({
+        title: "No results to save",
+        description: "Please calculate a macro score first before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      saveScore(results, data);
+      toast({
+        title: "Score saved successfully!",
+        description: "Your macro score has been saved to local storage.",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to save score",
+        description: "There was an error saving your score. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleLoadScore = (loadedData: MacroData) => {
+    setData(loadedData);
+    setResults(null); // Clear current results when loading new data
+    toast({
+      title: "Score loaded successfully!",
+      description: "The saved data has been loaded. Click 'Calculate Macro Score' to recalculate.",
+    });
   };
 
   return (
@@ -128,12 +167,25 @@ const Index = () => {
           />
           
           <div className="flex items-center justify-center">
-            <Button 
-              onClick={calculateScores}
-              className="w-full max-w-md h-16 text-lg font-semibold bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              Calculate Macro Score
-            </Button>
+            <div className="w-full max-w-md space-y-4">
+              <Button 
+                onClick={calculateScores}
+                className="w-full h-16 text-lg font-semibold bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                Calculate Macro Score
+              </Button>
+              
+              {results && (
+                <Button 
+                  onClick={handleSaveScore}
+                  variant="outline"
+                  className="w-full h-12 text-base font-medium border-2 border-green-500 text-green-700 hover:bg-green-50 shadow-md hover:shadow-lg transition-all duration-300"
+                >
+                  <Save className="mr-2" size={18} />
+                  Save Score
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -149,6 +201,10 @@ const Index = () => {
             <ExportData data={data} results={results} />
           </div>
         )}
+
+        <div className="mt-12">
+          <SavedScores onLoadScore={handleLoadScore} />
+        </div>
       </div>
     </div>
   );
