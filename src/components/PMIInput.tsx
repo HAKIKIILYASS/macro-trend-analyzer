@@ -47,17 +47,17 @@ const PMIInput: React.FC<PMIInputProps> = ({
   const pmiStatus = getPmiStatus(pmi);
 
   return (
-    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 border border-teal-200 bg-gradient-to-br from-white to-teal-50">
-      <CardHeader className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-t-lg">
+    <Card className="shadow-lg hover:shadow-xl transition-all duration-500 border border-teal-200 bg-gradient-to-br from-white to-teal-50 transform hover:scale-105 animate-fade-in">
+      <CardHeader className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-t-lg transition-all duration-300 hover:from-teal-700 hover:to-cyan-700">
         <CardTitle className="flex items-center gap-3 text-lg font-semibold">
-          <span className="text-xl">🏭</span>
+          <span className="text-xl animate-bounce-subtle">🏭</span>
           PMI Composite
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <Info size={16} className="text-teal-200 hover:text-white transition-colors" />
+                <Info size={16} className="text-teal-200 hover:text-white transition-colors duration-300 hover:rotate-12" />
               </TooltipTrigger>
-              <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-600">
+              <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-600 animate-scale-in">
                 <p>Purchasing Managers' Index measures manufacturing activity. Values above 50 indicate expansion, below 50 indicate contraction.</p>
               </TooltipContent>
             </Tooltip>
@@ -66,32 +66,34 @@ const PMIInput: React.FC<PMIInputProps> = ({
       </CardHeader>
       <CardContent className="p-6">
         <div className="space-y-4">
-          <div>
-            <Label htmlFor="current-pmi" className="text-base font-medium text-gray-700 mb-2 block">Current PMI</Label>
+          <div className="animate-slide-in-right delay-100">
+            <Label htmlFor="current-pmi" className="text-base font-medium text-gray-700 mb-2 block transition-colors duration-200 hover:text-teal-600">Current PMI</Label>
             <Input
               id="current-pmi"
               type="number"
               value={pmi}
               onChange={(e) => onPmiChange(parseFloat(e.target.value) || 0)}
               step={0.1}
-              className="text-base border-teal-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+              className="text-base border-teal-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all duration-300 hover:shadow-md"
             />
-            <p className={`text-sm mt-1 font-medium ${pmiStatus.color}`}>
-              {pmiStatus.status} ({pmi > 50 ? 'Above' : pmi < 50 ? 'Below' : 'At'} 50)
-            </p>
+            <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-3 rounded-lg mt-3 border-l-4 border-teal-400 transform hover:translate-x-1 transition-transform duration-300">
+              <p className={`text-sm mt-1 font-medium ${pmiStatus.color}`}>
+                {pmiStatus.status} ({pmi > 50 ? 'Above' : pmi < 50 ? 'Below' : 'At'} 50)
+              </p>
+            </div>
           </div>
           
-          <div>
-            <Label className="text-base font-medium text-gray-700 mb-2 block">3-Year PMI Historical Values</Label>
+          <div className="animate-slide-in-right delay-200">
+            <Label className="text-base font-medium text-gray-700 mb-2 block transition-colors duration-200 hover:text-teal-600">3-Year PMI Historical Values</Label>
             <div className="flex gap-2 mt-1">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Enter PMI value"
                 onKeyPress={(e) => e.key === 'Enter' && addValue()}
-                className="border-teal-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                className="border-teal-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all duration-300 hover:shadow-md"
               />
-              <Button onClick={addValue} size="sm" className="bg-teal-600 hover:bg-teal-700">Add</Button>
+              <Button onClick={addValue} size="sm" className="bg-teal-600 hover:bg-teal-700 transition-all duration-300 transform hover:scale-105">Add</Button>
             </div>
             
             <div className="flex flex-wrap gap-1 mt-2">
@@ -99,7 +101,7 @@ const PMIInput: React.FC<PMIInputProps> = ({
                 <Badge 
                   key={index} 
                   variant="secondary" 
-                  className="cursor-pointer hover:bg-red-100 bg-teal-100 text-teal-800 hover:bg-red-200"
+                  className="cursor-pointer hover:bg-red-100 bg-teal-100 text-teal-800 hover:bg-red-200 transition-all duration-300 transform hover:scale-110"
                   onClick={() => removeValue(index)}
                 >
                   {value} ×
@@ -108,7 +110,7 @@ const PMIInput: React.FC<PMIInputProps> = ({
             </div>
             
             {stats && (
-              <div className="mt-2 p-3 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg border-l-4 border-teal-400">
+              <div className="mt-2 p-3 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg border-l-4 border-teal-400 transform hover:translate-x-1 transition-transform duration-300">
                 <div className="text-sm text-gray-700">
                   <div>Mean: <strong className="text-teal-700">{stats.mean.toFixed(1)}</strong></div>
                   <div>Std Dev: <strong className="text-teal-700">{stats.std.toFixed(1)}</strong></div>
