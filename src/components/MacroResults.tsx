@@ -47,23 +47,23 @@ const MacroResults: React.FC<MacroResultsProps> = ({ results }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Overall Score */}
-      <Card className="border border-gray-200 shadow-xl bg-gradient-to-br from-white to-gray-50">
+      <Card className="border border-gray-200 shadow-xl bg-gradient-to-br from-white to-gray-50 transform hover:scale-105 transition-all duration-500">
         <CardHeader className="bg-gradient-to-r from-gray-800 to-gray-900 text-white text-center rounded-t-lg">
-          <CardTitle className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold animate-pulse">
             Macro Analysis Results
           </CardTitle>
         </CardHeader>
         <CardContent className="p-8 text-center">
           <div className="mb-6">
-            <div className="text-6xl font-bold mb-4" style={{ color: biasColor }}>
+            <div className="text-6xl font-bold mb-4 animate-bounce" style={{ color: biasColor }}>
               {total_score.toFixed(2)}
             </div>
             <div className="text-xl text-gray-700 font-semibold">Total Macro Score</div>
           </div>
           <Badge 
-            className="text-lg px-6 py-3 font-semibold" 
+            className="text-lg px-6 py-3 font-semibold transform hover:scale-110 transition-transform duration-300" 
             style={{ backgroundColor: biasColor, color: 'white' }}
           >
             {bias}
@@ -72,7 +72,7 @@ const MacroResults: React.FC<MacroResultsProps> = ({ results }) => {
       </Card>
 
       {/* Individual Scores */}
-      <Card className="border border-gray-200 shadow-xl bg-gradient-to-br from-white to-gray-50">
+      <Card className="border border-gray-200 shadow-xl bg-gradient-to-br from-white to-gray-50 animate-slide-in-right">
         <CardHeader className="bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-t-lg">
           <CardTitle className="text-xl font-semibold flex items-center gap-3">
             📊 Individual Indicator Scores
@@ -81,24 +81,28 @@ const MacroResults: React.FC<MacroResultsProps> = ({ results }) => {
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {scoreItems.map((item, index) => (
-              <div key={index} className="p-4 border border-gray-200 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div 
+                key={index} 
+                className="p-4 border border-gray-200 rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105 animate-fade-in"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg">{item.icon}</span>
+                    <span className="text-lg animate-pulse">{item.icon}</span>
                     <span className="font-medium text-gray-800">{item.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className={`text-xs font-medium px-2 py-1 bg-gradient-to-r ${item.color} text-white`}>
+                    <Badge variant="secondary" className={`text-xs font-medium px-2 py-1 bg-gradient-to-r ${item.color} text-white transform hover:scale-110 transition-transform duration-300`}>
                       {item.weight}%
                     </Badge>
-                    <span className={`text-base ${getScoreColor(item.score)}`}>
+                    <span className={`text-base ${getScoreColor(item.score)} transition-colors duration-300`}>
                       {item.score > 0 ? '+' : ''}{item.score.toFixed(2)}
                     </span>
                   </div>
                 </div>
                 <Progress 
                   value={normalizeScore(item.score)} 
-                  className="h-3 rounded-full bg-gray-200"
+                  className="h-3 rounded-full bg-gray-200 transition-all duration-500 hover:h-4"
                 />
                 <div className="flex justify-between text-xs text-gray-500 mt-2">
                   <span>-2.0</span>
@@ -112,7 +116,7 @@ const MacroResults: React.FC<MacroResultsProps> = ({ results }) => {
       </Card>
 
       {/* Legend */}
-      <Card className="border border-gray-200 shadow-xl bg-gradient-to-br from-white to-gray-50">
+      <Card className="border border-gray-200 shadow-xl bg-gradient-to-br from-white to-gray-50 animate-slide-in-right delay-500">
         <CardHeader className="bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-t-lg">
           <CardTitle className="text-lg font-semibold">
             Trading Bias Legend
@@ -120,21 +124,21 @@ const MacroResults: React.FC<MacroResultsProps> = ({ results }) => {
         </CardHeader>
         <CardContent className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3 text-sm">
-            <Badge className="bg-gradient-to-r from-green-600 to-green-700 text-white justify-center py-2 text-center font-medium shadow-lg">
-              Strong Bullish (≥1.0)
-            </Badge>
-            <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white justify-center py-2 text-center font-medium shadow-lg">
-              Mild Bullish (0.3-1.0)
-            </Badge>
-            <Badge className="bg-gradient-to-r from-gray-500 to-gray-600 text-white justify-center py-2 text-center font-medium shadow-lg">
-              Neutral (-0.3 to 0.3)
-            </Badge>
-            <Badge className="bg-gradient-to-r from-orange-500 to-orange-600 text-white justify-center py-2 text-center font-medium shadow-lg">
-              Mild Bearish (-1.0 to -0.3)
-            </Badge>
-            <Badge className="bg-gradient-to-r from-red-600 to-red-700 text-white justify-center py-2 text-center font-medium shadow-lg">
-              Strong Bearish (&lt;-1.0)
-            </Badge>
+            {[
+              { text: 'Strong Bullish (≥1.0)', gradient: 'from-green-600 to-green-700' },
+              { text: 'Mild Bullish (0.3-1.0)', gradient: 'from-green-500 to-green-600' },
+              { text: 'Neutral (-0.3 to 0.3)', gradient: 'from-gray-500 to-gray-600' },
+              { text: 'Mild Bearish (-1.0 to -0.3)', gradient: 'from-orange-500 to-orange-600' },
+              { text: 'Strong Bearish (<-1.0)', gradient: 'from-red-600 to-red-700' }
+            ].map((badge, index) => (
+              <Badge 
+                key={index}
+                className={`bg-gradient-to-r ${badge.gradient} text-white justify-center py-2 text-center font-medium shadow-lg transform hover:scale-110 transition-all duration-300 animate-fade-in`}
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                {badge.text}
+              </Badge>
+            ))}
           </div>
         </CardContent>
       </Card>
