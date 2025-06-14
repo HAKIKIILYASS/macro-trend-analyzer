@@ -62,80 +62,98 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 animate-fade-in">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-12 animate-fade-in">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
             Macroeconomic Analysis Dashboard
           </h1>
-          <p className="text-gray-600">
-            Input economic indicators to calculate macro scores and trading bias
+          <p className="text-lg text-gray-700 max-w-2xl mx-auto">
+            Input economic indicators to calculate macro scores and trading bias with advanced analytics
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <CentralBankInput 
-            value={data.cb_hawkish_index}
-            onChange={(value) => updateData('cb_hawkish_index', value)}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
+          <div className="animate-scale-in" style={{ animationDelay: '0.1s' }}>
+            <CentralBankInput 
+              value={data.cb_hawkish_index}
+              onChange={(value) => updateData('cb_hawkish_index', value)}
+            />
+          </div>
           
-          <InflationInput 
-            cpi={data.cpi}
-            cpi_target={data.cpi_target}
-            cpi_3m_change={data.cpi_3m_change}
-            onCpiChange={(value) => updateData('cpi', value)}
-            onTargetChange={(value) => updateData('cpi_target', value)}
-            onChange3M={(value) => updateData('cpi_3m_change', value)}
-          />
+          <div className="animate-scale-in" style={{ animationDelay: '0.2s' }}>
+            <InflationInput 
+              cpi={data.cpi}
+              cpi_target={data.cpi_target}
+              cpi_3m_change={data.cpi_3m_change}
+              onCpiChange={(value) => updateData('cpi', value)}
+              onTargetChange={(value) => updateData('cpi_target', value)}
+              onChange3M={(value) => updateData('cpi_3m_change', value)}
+            />
+          </div>
           
-          <LaborMarketInput 
-            current_nfp={data.current_nfp}
-            nfp_12m_values={data.nfp_12m_values}
-            onCurrentChange={(value) => updateData('current_nfp', value)}
-            onValuesChange={(values) => updateData('nfp_12m_values', values)}
-          />
+          <div className="animate-scale-in" style={{ animationDelay: '0.3s' }}>
+            <LaborMarketInput 
+              current_nfp={data.current_nfp}
+              nfp_12m_values={data.nfp_12m_values}
+              onCurrentChange={(value) => updateData('current_nfp', value)}
+              onValuesChange={(values) => updateData('nfp_12m_values', values)}
+            />
+          </div>
           
-          <RiskSentimentInput 
-            credit_spread_1m_change={data.credit_spread_1m_change}
-            vix={data.vix}
-            onCreditChange={(value) => updateData('credit_spread_1m_change', value)}
-            onVixChange={(value) => updateData('vix', value)}
-          />
+          <div className="animate-scale-in" style={{ animationDelay: '0.4s' }}>
+            <RiskSentimentInput 
+              credit_spread_1m_change={data.credit_spread_1m_change}
+              vix={data.vix}
+              onCreditChange={(value) => updateData('credit_spread_1m_change', value)}
+              onVixChange={(value) => updateData('vix', value)}
+            />
+          </div>
           
-          <PMIInput 
-            pmi={data.pmi}
-            pmi_3y_values={data.pmi_3y_values}
-            onPmiChange={(value) => updateData('pmi', value)}
-            onValuesChange={(values) => updateData('pmi_3y_values', values)}
-          />
+          <div className="animate-scale-in" style={{ animationDelay: '0.5s' }}>
+            <PMIInput 
+              pmi={data.pmi}
+              pmi_3y_values={data.pmi_3y_values}
+              onPmiChange={(value) => updateData('pmi', value)}
+              onValuesChange={(values) => updateData('pmi_3y_values', values)}
+            />
+          </div>
           
-          <CurrentAccountInput 
-            ca_gdp={data.ca_gdp}
-            ca_5y_values={data.ca_5y_values}
-            onCurrentChange={(value) => updateData('ca_gdp', value)}
-            onValuesChange={(values) => updateData('ca_5y_values', values)}
-          />
+          <div className="animate-scale-in" style={{ animationDelay: '0.6s' }}>
+            <CurrentAccountInput 
+              ca_gdp={data.ca_gdp}
+              ca_5y_values={data.ca_5y_values}
+              onCurrentChange={(value) => updateData('ca_gdp', value)}
+              onValuesChange={(values) => updateData('ca_5y_values', values)}
+            />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <GeopoliticalInput 
-            gpr={data.gpr}
-            gpr_3y_values={data.gpr_3y_values}
-            onGprChange={(value) => updateData('gpr', value)}
-            onValuesChange={(values) => updateData('gpr_3y_values', values)}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <div className="animate-scale-in" style={{ animationDelay: '0.7s' }}>
+            <GeopoliticalInput 
+              gpr={data.gpr}
+              gpr_3y_values={data.gpr_3y_values}
+              onGprChange={(value) => updateData('gpr', value)}
+              onValuesChange={(values) => updateData('gpr_3y_values', values)}
+            />
+          </div>
           
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center animate-scale-in" style={{ animationDelay: '0.8s' }}>
             <Button 
               onClick={calculateScores}
-              className="w-full max-w-md h-16 text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+              className="w-full max-w-md h-20 text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 animate-pulse"
             >
-              Calculate Macro Score
+              🚀 Calculate Macro Score
             </Button>
           </div>
         </div>
 
-        {results && <MacroResults results={results} />}
+        {results && (
+          <div className="animate-fade-in">
+            <MacroResults results={results} />
+          </div>
+        )}
       </div>
     </div>
   );
