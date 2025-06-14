@@ -20,6 +20,7 @@ import { calculateMacroScore } from '@/utils/macroCalculations';
 import { saveScore } from '@/utils/scoreStorage';
 import { useToast } from '@/hooks/use-toast';
 import SaveScoreDialog from '@/components/SaveScoreDialog';
+import { downloadScoreAsFile } from '@/utils/downloadScoreAsFile';
 
 export interface MacroData {
   cb_hawkish_index: number;
@@ -68,22 +69,11 @@ const Index = () => {
   const calculateScores = () => {
     const calculatedResults = calculateMacroScore(data);
     setResults(calculatedResults);
-    
-    // Auto-save the score with timestamp-based name
-    const autoSaveName = `Auto-${new Date().toISOString().slice(0, 16).replace('T', '_')}`;
-    try {
-      saveScore(calculatedResults, data, autoSaveName);
-      toast({
-        title: "Score calculated and auto-saved!",
-        description: `Results saved as "${autoSaveName}".`,
-      });
-    } catch (error) {
-      toast({
-        title: "Score calculated but auto-save failed",
-        description: "You can still save manually if needed.",
-        variant: "destructive",
-      });
-    }
+
+    toast({
+      title: "Score calculated!",
+      description: "Review your macro score. Save it manually to keep a record.",
+    });
   };
 
   const handleSaveScore = (name: string, customDate: Date) => {
@@ -98,10 +88,11 @@ const Index = () => {
 
     try {
       saveScore(results, data, name, customDate);
+      downloadScoreAsFile(results, data, name, customDate);
       setShowSaveDialog(false);
       toast({
-        title: "Score saved successfully!",
-        description: `Your macro score has been saved as "${name}".`,
+        title: "Score saved!",
+        description: `Your macro score has been saved as "${name}" and downloaded locally.`,
       });
     } catch (error) {
       toast({
@@ -191,7 +182,7 @@ const Index = () => {
                 onClick={calculateScores}
                 className="w-full h-16 text-lg font-semibold bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                Calculate Macro Score (Auto-Save)
+                Calculate Macro Score
               </Button>
               
               {results && (
