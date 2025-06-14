@@ -39,17 +39,17 @@ const GeopoliticalInput: React.FC<GeopoliticalInputProps> = ({
   const stats = calculateMeanStd(gpr_3y_values);
 
   return (
-    <Card className="shadow-lg hover:shadow-xl transition-all duration-500 border border-rose-200 bg-gradient-to-br from-white to-rose-50 transform hover:scale-105 animate-fade-in">
-      <CardHeader className="bg-gradient-to-r from-rose-600 to-pink-600 text-white rounded-t-lg transition-all duration-300 hover:from-rose-700 hover:to-pink-700">
+    <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-rose-200 bg-gradient-to-br from-white to-rose-50">
+      <CardHeader className="bg-gradient-to-r from-rose-600 to-pink-600 text-white rounded-t-lg">
         <CardTitle className="flex items-center gap-3 text-lg font-semibold">
-          <span className="text-xl animate-bounce-subtle">🌍</span>
+          <span className="text-xl">🌍</span>
           Geopolitical Risk
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <Info size={16} className="text-rose-200 hover:text-white transition-colors duration-300 hover:rotate-12" />
+                <Info size={16} className="text-rose-200 hover:text-white transition-colors duration-200" />
               </TooltipTrigger>
-              <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-600 animate-scale-in">
+              <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-600">
                 <p>Geopolitical Risk Index measures global political tensions and conflicts. Higher values indicate greater geopolitical instability.</p>
               </TooltipContent>
             </Tooltip>
@@ -58,7 +58,7 @@ const GeopoliticalInput: React.FC<GeopoliticalInputProps> = ({
       </CardHeader>
       <CardContent className="p-6">
         <div className="space-y-4">
-          <div className="animate-slide-in-right delay-100">
+          <div>
             <Label htmlFor="gpr" className="text-base font-medium text-gray-700 mb-2 block transition-colors duration-200 hover:text-rose-600">Current GPR Index</Label>
             <Input
               id="gpr"
@@ -66,16 +66,16 @@ const GeopoliticalInput: React.FC<GeopoliticalInputProps> = ({
               value={gpr}
               onChange={(e) => onGprChange(parseFloat(e.target.value) || 0)}
               step={0.1}
-              className="text-base border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all duration-300 hover:shadow-md"
+              className="text-base border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all duration-200"
             />
-            <div className="bg-gradient-to-r from-rose-50 to-pink-50 p-3 rounded-lg mt-3 border-l-4 border-rose-400 transform hover:translate-x-1 transition-transform duration-300">
+            <div className="bg-gradient-to-r from-rose-50 to-pink-50 p-3 rounded-lg mt-3 border-l-4 border-rose-400 shadow-sm">
               <p className="text-sm text-gray-700">
                 <span className="text-rose-600 font-medium">Higher values indicate greater geopolitical risk</span>
               </p>
             </div>
           </div>
           
-          <div className="animate-slide-in-right delay-200">
+          <div>
             <Label className="text-base font-medium text-gray-700 mb-2 block transition-colors duration-200 hover:text-rose-600">3-Year GPR Historical Values</Label>
             <div className="flex gap-2 mt-1">
               <Input
@@ -83,9 +83,9 @@ const GeopoliticalInput: React.FC<GeopoliticalInputProps> = ({
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Enter GPR value"
                 onKeyPress={(e) => e.key === 'Enter' && addValue()}
-                className="border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all duration-300 hover:shadow-md"
+                className="border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all duration-200"
               />
-              <Button onClick={addValue} size="sm" className="bg-rose-600 hover:bg-rose-700 transition-all duration-300 transform hover:scale-105">Add</Button>
+              <Button onClick={addValue} size="sm" className="bg-rose-600 hover:bg-rose-700 transition-colors duration-200">Add</Button>
             </div>
             
             <div className="flex flex-wrap gap-1 mt-2">
@@ -93,7 +93,7 @@ const GeopoliticalInput: React.FC<GeopoliticalInputProps> = ({
                 <Badge 
                   key={index} 
                   variant="secondary" 
-                  className="cursor-pointer hover:bg-red-100 bg-rose-100 text-rose-800 hover:bg-red-200 transition-all duration-300 transform hover:scale-110"
+                  className="cursor-pointer bg-rose-100 text-rose-800 hover:bg-red-200 transition-colors duration-200"
                   onClick={() => removeValue(index)}
                 >
                   {value} ×
@@ -102,7 +102,7 @@ const GeopoliticalInput: React.FC<GeopoliticalInputProps> = ({
             </div>
             
             {stats && (
-              <div className="mt-2 p-3 bg-gradient-to-r from-rose-50 to-pink-50 rounded-lg border-l-4 border-rose-400 transform hover:translate-x-1 transition-transform duration-300">
+              <div className="mt-2 p-3 bg-gradient-to-r from-rose-50 to-pink-50 rounded-lg border-l-4 border-rose-400 shadow-sm">
                 <div className="text-sm text-gray-700">
                   <div>Mean: <strong className="text-rose-700">{stats.mean.toFixed(1)}</strong></div>
                   <div>Std Dev: <strong className="text-rose-700">{stats.std.toFixed(1)}</strong></div>

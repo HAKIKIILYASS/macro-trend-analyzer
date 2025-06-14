@@ -47,23 +47,23 @@ const MacroResults: React.FC<MacroResultsProps> = ({ results }) => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* Overall Score */}
-      <Card className="border border-gray-200 shadow-xl bg-gradient-to-br from-white to-gray-50 transform hover:scale-105 transition-all duration-500">
+      <Card className="border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gradient-to-br from-white to-gray-50">
         <CardHeader className="bg-gradient-to-r from-gray-800 to-gray-900 text-white text-center rounded-t-lg">
-          <CardTitle className="text-2xl font-bold animate-pulse">
+          <CardTitle className="text-2xl font-bold">
             Macro Analysis Results
           </CardTitle>
         </CardHeader>
         <CardContent className="p-8 text-center">
           <div className="mb-6">
-            <div className="text-6xl font-bold mb-4 animate-bounce" style={{ color: biasColor }}>
+            <div className="text-6xl font-bold mb-4" style={{ color: biasColor }}>
               {total_score.toFixed(2)}
             </div>
             <div className="text-xl text-gray-700 font-semibold">Total Macro Score</div>
           </div>
           <Badge 
-            className="text-lg px-6 py-3 font-semibold transform hover:scale-110 transition-transform duration-300" 
+            className="text-lg px-6 py-3 font-semibold transition-transform duration-200 hover:scale-105" 
             style={{ backgroundColor: biasColor, color: 'white' }}
           >
             {bias}
@@ -72,7 +72,7 @@ const MacroResults: React.FC<MacroResultsProps> = ({ results }) => {
       </Card>
 
       {/* Individual Scores */}
-      <Card className="border border-gray-200 shadow-xl bg-gradient-to-br from-white to-gray-50 animate-slide-in-right">
+      <Card className="border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gradient-to-br from-white to-gray-50">
         <CardHeader className="bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-t-lg">
           <CardTitle className="text-xl font-semibold flex items-center gap-3">
             📊 Individual Indicator Scores
@@ -83,26 +83,25 @@ const MacroResults: React.FC<MacroResultsProps> = ({ results }) => {
             {scoreItems.map((item, index) => (
               <div 
                 key={index} 
-                className="p-4 border border-gray-200 rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105 animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="p-4 border border-gray-200 rounded-xl bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg animate-pulse">{item.icon}</span>
+                    <span className="text-lg">{item.icon}</span>
                     <span className="font-medium text-gray-800">{item.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className={`text-xs font-medium px-2 py-1 bg-gradient-to-r ${item.color} text-white transform hover:scale-110 transition-transform duration-300`}>
+                    <Badge variant="secondary" className={`text-xs font-medium px-2 py-1 bg-gradient-to-r ${item.color} text-white transition-transform duration-200 hover:scale-105`}>
                       {item.weight}%
                     </Badge>
-                    <span className={`text-base ${getScoreColor(item.score)} transition-colors duration-300`}>
+                    <span className={`text-base ${getScoreColor(item.score)} transition-colors duration-200`}>
                       {item.score > 0 ? '+' : ''}{item.score.toFixed(2)}
                     </span>
                   </div>
                 </div>
                 <Progress 
                   value={normalizeScore(item.score)} 
-                  className="h-3 rounded-full bg-gray-200 transition-all duration-500 hover:h-4"
+                  className="h-3 rounded-full bg-gray-200 transition-all duration-300"
                 />
                 <div className="flex justify-between text-xs text-gray-500 mt-2">
                   <span>-2.0</span>
@@ -116,7 +115,7 @@ const MacroResults: React.FC<MacroResultsProps> = ({ results }) => {
       </Card>
 
       {/* Legend */}
-      <Card className="border border-gray-200 shadow-xl bg-gradient-to-br from-white to-gray-50 animate-slide-in-right delay-500">
+      <Card className="border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gradient-to-br from-white to-gray-50">
         <CardHeader className="bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-t-lg">
           <CardTitle className="text-lg font-semibold">
             Trading Bias Legend
@@ -133,8 +132,7 @@ const MacroResults: React.FC<MacroResultsProps> = ({ results }) => {
             ].map((badge, index) => (
               <Badge 
                 key={index}
-                className={`bg-gradient-to-r ${badge.gradient} text-white justify-center py-2 text-center font-medium shadow-lg transform hover:scale-110 transition-all duration-300 animate-fade-in`}
-                style={{ animationDelay: `${index * 100}ms` }}
+                className={`bg-gradient-to-r ${badge.gradient} text-white justify-center py-2 text-center font-medium shadow-md transition-transform duration-200 hover:scale-105`}
               >
                 {badge.text}
               </Badge>
