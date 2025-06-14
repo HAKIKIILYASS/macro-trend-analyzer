@@ -19,6 +19,7 @@ import SavedScores from '@/components/SavedScores';
 import { calculateMacroScore } from '@/utils/macroCalculations';
 import { saveScore } from '@/utils/scoreStorage';
 import { useToast } from '@/hooks/use-toast';
+import SaveScoreDialog from '@/components/SaveScoreDialog';
 
 export interface MacroData {
   cb_hawkish_index: number;
@@ -56,6 +57,7 @@ const Index = () => {
   });
 
   const [results, setResults] = useState(null);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
 
   const { toast } = useToast();
 
@@ -68,7 +70,7 @@ const Index = () => {
     setResults(calculatedResults);
   };
 
-  const handleSaveScore = () => {
+  const handleSaveScore = (name: string) => {
     if (!results) {
       toast({
         title: "No results to save",
@@ -79,10 +81,11 @@ const Index = () => {
     }
 
     try {
-      saveScore(results, data);
+      saveScore(results, data, name);
+      setShowSaveDialog(false);
       toast({
         title: "Score saved successfully!",
-        description: "Your macro score has been saved to local storage.",
+        description: `Your macro score has been saved as "${name}".`,
       });
     } catch (error) {
       toast({
@@ -177,7 +180,7 @@ const Index = () => {
               
               {results && (
                 <Button 
-                  onClick={handleSaveScore}
+                  onClick={() => setShowSaveDialog(true)}
                   variant="outline"
                   className="w-full h-12 text-base font-medium border-2 border-green-500 text-green-700 hover:bg-green-50 shadow-md hover:shadow-lg transition-all duration-300"
                 >
@@ -205,6 +208,12 @@ const Index = () => {
         <div className="mt-12">
           <SavedScores onLoadScore={handleLoadScore} />
         </div>
+
+        <SaveScoreDialog
+          isOpen={showSaveDialog}
+          onSave={handleSaveScore}
+          onCancel={() => setShowSaveDialog(false)}
+        />
       </div>
     </div>
   );

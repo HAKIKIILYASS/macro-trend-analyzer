@@ -7,6 +7,7 @@ import { Trash2, Calendar } from 'lucide-react';
 
 interface SavedScore {
   id: string;
+  name: string;
   timestamp: Date;
   totalScore: number;
   bias: string;
@@ -79,8 +80,11 @@ const SavedScores: React.FC<SavedScoresProps> = ({ onLoadScore }) => {
             >
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
+                  <span className="text-lg font-bold text-gray-800">
+                    {score.name}
+                  </span>
                   <span 
-                    className="text-2xl font-bold"
+                    className="text-xl font-bold"
                     style={{ color: score.biasColor }}
                   >
                     {score.totalScore.toFixed(2)}

@@ -1,5 +1,7 @@
+
 interface SavedScore {
   id: string;
+  name: string;
   timestamp: Date;
   totalScore: number;
   bias: string;
@@ -7,9 +9,10 @@ interface SavedScore {
   data: any;
 }
 
-export const saveScore = (results: any, data: any): void => {
+export const saveScore = (results: any, data: any, name: string): void => {
   const savedScore: SavedScore = {
     id: Date.now().toString(),
+    name: name,
     timestamp: new Date(),
     totalScore: results.total_score,
     bias: results.bias,
