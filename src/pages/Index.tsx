@@ -88,11 +88,10 @@ const Index = () => {
 
     try {
       saveScore(results, data, name, customDate);
-      downloadScoreAsFile(results, data, name, customDate);
       setShowSaveDialog(false);
       toast({
         title: "Score saved!",
-        description: `Your macro score has been saved as "${name}" and downloaded locally.`,
+        description: `Your macro score has been saved as "${name}".`,
       });
     } catch (error) {
       toast({
