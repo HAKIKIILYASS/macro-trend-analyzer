@@ -3,6 +3,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
 
 interface RiskSentimentInputProps {
   credit_spread_1m_change: number;
@@ -33,6 +35,16 @@ const RiskSentimentInput: React.FC<RiskSentimentInputProps> = ({
         <CardTitle className="flex items-center gap-3 text-lg font-semibold">
           <span className="text-xl">⚠️</span>
           Risk Sentiment
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info size={16} className="text-slate-300 hover:text-white" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p>Measures market risk appetite through credit spreads and volatility. Higher values indicate risk aversion, while lower values suggest risk-on sentiment.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">

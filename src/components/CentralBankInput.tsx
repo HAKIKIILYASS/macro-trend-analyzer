@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
 
 interface CentralBankInputProps {
   value: number;
@@ -17,6 +19,16 @@ const CentralBankInput: React.FC<CentralBankInputProps> = ({ value, onChange }) 
         <CardTitle className="flex items-center gap-3 text-lg font-semibold">
           <span className="text-xl">🏦</span>
           Central Bank Policy
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info size={16} className="text-slate-300 hover:text-white" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p>Measures the central bank's monetary policy stance. Higher values indicate more hawkish (restrictive) policy, while lower values suggest dovish (accommodative) policy.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">

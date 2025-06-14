@@ -3,6 +3,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
 
 interface InflationInputProps {
   cpi: number;
@@ -27,6 +29,16 @@ const InflationInput: React.FC<InflationInputProps> = ({
         <CardTitle className="flex items-center gap-3 text-lg font-semibold">
           <span className="text-xl">📈</span>
           Inflation Trend
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info size={16} className="text-slate-300 hover:text-white" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p>Consumer Price Index measures the rate of inflation. Compare current CPI with the target to assess inflationary pressures and potential policy responses.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">

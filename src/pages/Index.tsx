@@ -13,6 +13,8 @@ import PMIInput from '@/components/PMIInput';
 import CurrentAccountInput from '@/components/CurrentAccountInput';
 import GeopoliticalInput from '@/components/GeopoliticalInput';
 import MacroResults from '@/components/MacroResults';
+import DataVisualization from '@/components/DataVisualization';
+import ExportData from '@/components/ExportData';
 import { calculateMacroScore } from '@/utils/macroCalculations';
 
 export interface MacroData {
@@ -136,8 +138,19 @@ const Index = () => {
         </div>
 
         {results && (
-          <div className="animate-fade-in">
-            <MacroResults results={results} />
+          <div className="space-y-8">
+            <div className="animate-fade-in">
+              <MacroResults results={results} />
+            </div>
+            
+            <div className="animate-fade-in">
+              <h2 className="text-2xl font-bold text-slate-800 mb-6">Data Visualization</h2>
+              <DataVisualization data={data} />
+            </div>
+            
+            <div className="animate-fade-in">
+              <ExportData data={data} results={results} />
+            </div>
           </div>
         )}
       </div>
