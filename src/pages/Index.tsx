@@ -68,6 +68,22 @@ const Index = () => {
   const calculateScores = () => {
     const calculatedResults = calculateMacroScore(data);
     setResults(calculatedResults);
+    
+    // Auto-save the score with timestamp-based name
+    const autoSaveName = `Auto-${new Date().toISOString().slice(0, 16).replace('T', '_')}`;
+    try {
+      saveScore(calculatedResults, data, autoSaveName);
+      toast({
+        title: "Score calculated and auto-saved!",
+        description: `Results saved as "${autoSaveName}".`,
+      });
+    } catch (error) {
+      toast({
+        title: "Score calculated but auto-save failed",
+        description: "You can still save manually if needed.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSaveScore = (name: string, customDate: Date) => {
@@ -175,7 +191,7 @@ const Index = () => {
                 onClick={calculateScores}
                 className="w-full h-16 text-lg font-semibold bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                Calculate Macro Score
+                Calculate Macro Score (Auto-Save)
               </Button>
               
               {results && (
@@ -185,7 +201,7 @@ const Index = () => {
                   className="w-full h-12 text-base font-medium border-2 border-green-500 text-green-700 hover:bg-green-50 shadow-md hover:shadow-lg transition-all duration-300"
                 >
                   <Save className="mr-2" size={18} />
-                  Save Score
+                  Save with Custom Name
                 </Button>
               )}
             </div>
