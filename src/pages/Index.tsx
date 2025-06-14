@@ -64,13 +64,13 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-800 mb-4">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
             Macroeconomic Analysis Dashboard
           </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto font-medium">
             Input economic indicators to calculate macro scores and trading bias
           </p>
         </div>
@@ -130,7 +130,7 @@ const Index = () => {
           <div className="flex items-center justify-center">
             <Button 
               onClick={calculateScores}
-              className="w-full max-w-md h-16 text-lg font-semibold bg-slate-700 hover:bg-slate-800 shadow-md"
+              className="w-full max-w-md h-16 text-lg font-semibold bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
             >
               Calculate Macro Score
             </Button>
@@ -144,7 +144,7 @@ const Index = () => {
             </div>
             
             <div className="animate-fade-in">
-              <h2 className="text-2xl font-bold text-slate-800 mb-6">Data Visualization</h2>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-6">Data Visualization</h2>
               <DataVisualization data={data} />
             </div>
             

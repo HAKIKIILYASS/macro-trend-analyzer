@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MacroData } from '@/pages/Index';
-import { FileText } from 'lucide-react';
+import { FileText, Download } from 'lucide-react';
 
 interface ExportDataProps {
   data: MacroData;
@@ -62,9 +63,9 @@ const ExportData: React.FC<ExportDataProps> = ({ data, results }) => {
   };
 
   return (
-    <Card className="border border-slate-200">
-      <CardHeader className="bg-slate-700 text-white">
-        <CardTitle className="flex items-center gap-3">
+    <Card className="shadow-lg border border-indigo-200 bg-gradient-to-br from-white to-indigo-50">
+      <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-lg">
+        <CardTitle className="flex items-center gap-3 text-lg font-semibold">
           <FileText size={20} />
           Export Data
         </CardTitle>
@@ -74,19 +75,21 @@ const ExportData: React.FC<ExportDataProps> = ({ data, results }) => {
           <Button 
             onClick={exportToJSON}
             variant="outline"
-            className="border-slate-300 hover:bg-slate-50"
+            className="border-indigo-300 hover:bg-indigo-50 hover:border-indigo-400 text-indigo-700 font-medium flex items-center gap-2"
           >
+            <Download size={16} />
             Export as JSON
           </Button>
           <Button 
             onClick={exportToCSV}
             variant="outline"
-            className="border-slate-300 hover:bg-slate-50"
+            className="border-indigo-300 hover:bg-indigo-50 hover:border-indigo-400 text-indigo-700 font-medium flex items-center gap-2"
           >
+            <Download size={16} />
             Export as CSV
           </Button>
         </div>
-        <p className="text-sm text-slate-600 mt-3">
+        <p className="text-sm text-gray-600 mt-3">
           Export your analysis data and results for external use or record keeping.
         </p>
       </CardContent>
