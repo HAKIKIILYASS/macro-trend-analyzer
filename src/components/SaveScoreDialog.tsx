@@ -4,10 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Save, X } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Save, X, Calendar as CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface SaveScoreDialogProps {
-  onSave: (name: string) => void;
+  onSave: (name: string, date: Date) => void;
   onCancel: () => void;
   isOpen: boolean;
 }
@@ -18,11 +21,14 @@ const SaveScoreDialog: React.FC<SaveScoreDialogProps> = ({
   isOpen 
 }) => {
   const [name, setName] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const handleSave = () => {
     if (name.trim()) {
-      onSave(name.trim());
+      onSave(name.trim(), selectedDate);
       setName('');
+      setSelectedDate(new Date());
     }
   };
 
@@ -72,6 +78,37 @@ const SaveScoreDialog: React.FC<SaveScoreDialogProps> = ({
                 autoFocus
               />
             </div>
+            
+            <div>
+              <Label className="text-sm font-medium text-gray-700">
+                Date
+              </Label>
+              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal mt-1"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => {
+                      if (date) {
+                        setSelectedDate(date);
+                        setIsCalendarOpen(false);
+                      }
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
             <div className="flex justify-end gap-3">
               <Button
                 variant="outline"

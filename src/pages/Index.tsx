@@ -70,7 +70,7 @@ const Index = () => {
     setResults(calculatedResults);
   };
 
-  const handleSaveScore = (name: string) => {
+  const handleSaveScore = (name: string, customDate: Date) => {
     if (!results) {
       toast({
         title: "No results to save",
@@ -81,7 +81,7 @@ const Index = () => {
     }
 
     try {
-      saveScore(results, data, name);
+      saveScore(results, data, name, customDate);
       setShowSaveDialog(false);
       toast({
         title: "Score saved successfully!",
