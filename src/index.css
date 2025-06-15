@@ -104,66 +104,67 @@
 
 /* Improved contrast and readability in dark mode */
 .dark .bg-gray-50 {
-  @apply bg-gray-900/90;
+  background-color: rgb(17 24 39 / 0.9);
 }
 
 .dark .text-gray-900 {
-  @apply text-gray-50;
+  color: rgb(249 250 251);
 }
 
 .dark .text-gray-600 {
-  @apply text-gray-300;
+  color: rgb(209 213 219);
 }
 
 .dark .text-gray-700 {
-  @apply text-gray-200;
+  color: rgb(229 231 235);
 }
 
 .dark .border-gray-200 {
-  @apply border-gray-700/60;
+  border-color: rgb(55 65 81 / 0.6);
 }
 
 .dark .border-gray-300 {
-  @apply border-gray-600/60;
+  border-color: rgb(75 85 99 / 0.6);
 }
 
-/* Enhanced shadows for dark mode */
+/* Enhanced shadows for dark mode - using direct CSS instead of @apply */
 .dark .shadow-lg {
-  @apply shadow-2xl shadow-black/30;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
 }
 
 .dark .shadow-md {
-  @apply shadow-xl shadow-black/25;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .dark .shadow-sm {
-  @apply shadow-lg shadow-black/20;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Improved card styling in dark mode */
 .dark .bg-white {
-  @apply bg-gray-800/90 backdrop-blur-sm;
+  background-color: rgb(31 41 55 / 0.9);
+  backdrop-filter: blur(4px);
 }
 
 .dark .bg-gradient-to-br {
   background: linear-gradient(to bottom right, 
-    theme('colors.gray.800'), 
-    theme('colors.gray.900')
+    rgb(31 41 55), 
+    rgb(17 24 39)
   );
 }
 
 /* Enhanced hover states for dark mode */
 .dark .hover\:bg-gray-50:hover {
-  @apply bg-gray-800/60;
+  background-color: rgb(31 41 55 / 0.6);
 }
 
 .dark .hover\:bg-gray-100:hover {
-  @apply bg-gray-700/60;
+  background-color: rgb(55 65 81 / 0.6);
 }
 
 /* Better focus rings in dark mode */
 .dark .focus\:ring-2:focus {
-  @apply ring-blue-400/50;
+  ring-color: rgb(96 165 250 / 0.5);
 }
 
 /* Scrollbar styling for dark mode */
@@ -173,32 +174,34 @@
 }
 
 .dark ::-webkit-scrollbar-track {
-  @apply bg-gray-800;
+  background-color: rgb(31 41 55);
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  @apply bg-gray-600 rounded-lg;
+  background-color: rgb(75 85 99);
+  border-radius: 0.5rem;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500;
+  background-color: rgb(107 114 128);
 }
 
 /* Enhanced gradients for dark mode backgrounds */
 .dark .bg-gradient-to-br.from-gray-50.to-gray-100 {
   background: linear-gradient(to bottom right, 
-    theme('colors.gray.900'), 
-    theme('colors.gray.800')
+    rgb(17 24 39), 
+    rgb(31 41 55)
   );
 }
 
 /* Better selection colors in dark mode */
 .dark ::selection {
-  @apply bg-blue-600/30 text-blue-100;
+  background-color: rgb(37 99 235 / 0.3);
+  color: rgb(219 234 254);
 }
 
 /* Improved placeholder text in dark mode */
 .dark input::placeholder,
 .dark textarea::placeholder {
-  @apply text-gray-500;
+  color: rgb(107 114 128);
 }
