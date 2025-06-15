@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Save } from 'lucide-react';
+import { Save, Menu } from 'lucide-react';
 import CentralBankInput from '@/components/CentralBankInput';
 import InflationInput from '@/components/InflationInput';
 import LaborMarketInput from '@/components/LaborMarketInput';
@@ -121,14 +121,23 @@ const Index = () => {
   };
 
   const handleCompare = (score: any, slot: "A" | "B") => {
+    console.log('handleCompare called:', slot, score.name);
     let results;
     try {
       results = calculateMacroScore(score.data);
-    } catch {
+    } catch (error) {
+      console.error('Error calculating score for comparison:', error);
       results = null;
     }
     const obj = { label: score.name, data: score.data, results };
-    slot === "A" ? setCompareA(obj) : setCompareB(obj);
+    
+    if (slot === "A") {
+      setCompareA(obj);
+      console.log('Set compareA:', obj);
+    } else {
+      setCompareB(obj);
+      console.log('Set compareB:', obj);
+    }
     
     toast({
       title: `Scenario ${slot} set!`,
@@ -148,8 +157,21 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-50 via-blue-50/30 to-green-50/30 dark:from-gray-900 dark:via-blue-950/20 dark:to-green-950/20 transition-all duration-500">
-        <div className="fixed right-4 top-4 z-50">
-          <ThemeSwitcher />
+        
+        {/* Top controls */}
+        <div className="fixed top-4 left-4 right-4 z-50 flex justify-between items-center pointer-events-none">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="pointer-events-auto bg-white/90 hover:bg-white backdrop-blur-sm shadow-lg border-gray-200"
+          >
+            <Menu className="mr-2 h-4 w-4" />
+            {sidebarOpen ? 'Hide' : 'Show'} Recent Scores
+          </Button>
+          <div className="pointer-events-auto">
+            <ThemeSwitcher />
+          </div>
         </div>
 
         <div className="fixed left-0 top-0 h-screen z-40">
@@ -161,7 +183,7 @@ const Index = () => {
           />
         </div>
 
-        <div className={`flex-1 p-4 transition-all duration-200 ${sidebarOpen ? "md:ml-72" : ""}`}>
+        <div className={`flex-1 p-4 pt-20 transition-all duration-200 ${sidebarOpen ? "md:ml-72" : ""}`}>
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-50 dark:to-gray-300 bg-clip-text text-transparent mb-4 animate-fade-in">
