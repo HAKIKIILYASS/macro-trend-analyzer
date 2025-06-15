@@ -1,8 +1,8 @@
-
 import * as React from "react"
 import { Moon, Sun } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Card } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 
 export default function ThemeSwitcher() {
   const [theme, setTheme] = React.useState<"light"|"dark">(window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
