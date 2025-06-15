@@ -22,6 +22,7 @@ import { saveScore } from '@/utils/localServerStorage';
 import { useToast } from '@/hooks/use-toast';
 import SaveScoreDialog from '@/components/SaveScoreDialog';
 import { downloadScoreAsFile } from '@/utils/downloadScoreAsFile';
+import ServerStatus from '@/components/ServerStatus';
 
 export interface MacroData {
   cb_hawkish_index: number;
@@ -123,6 +124,11 @@ const Index = () => {
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Advanced economic indicators analysis with real-time macro scoring and trading bias assessment
             </p>
+          </div>
+
+          {/* Server Status */}
+          <div className="flex justify-center mb-6">
+            <ServerStatus />
           </div>
 
           {results && (
