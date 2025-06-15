@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -47,12 +46,12 @@ const ComparisonMetric = ({ label, valueA, valueB, format = "number" }: {
   };
 
   return (
-    <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-200 border border-transparent hover:border-muted-foreground/10">
+    <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-all duration-200 border border-transparent hover:border-primary/20 animate-slide-up">
       <span className="text-sm font-medium text-foreground">{label}</span>
       <div className="flex items-center gap-3">
-        <span className="text-sm font-mono">{formatValue(valueA)}</span>
+        <span className="text-sm font-mono text-muted-foreground">{formatValue(valueA)}</span>
         <ArrowRight className="w-3 h-3 text-muted-foreground" />
-        <span className="text-sm font-mono">{formatValue(valueB)}</span>
+        <span className="text-sm font-mono font-medium">{formatValue(valueB)}</span>
         <div className="flex items-center gap-1 ml-3 min-w-[60px] justify-end">
           {getDiffIcon()}
           <span className={cn("text-xs font-medium font-mono", getDiffColor())}>
@@ -99,20 +98,20 @@ Difference: ${(scoreBValue - scoreAValue).toFixed(2)}
   return (
     <div className="w-full flex flex-col items-center mb-8">
       <div className="flex items-center gap-4 mb-6">
-        <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+        <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
           Compare Scenarios
         </h2>
         {hasComparison && (
           <div className="flex items-center gap-2">
-            <Badge variant="default" className="animate-pulse bg-gradient-to-r from-blue-500 to-green-500 text-white">
+            <Badge variant="default" className="animate-pulse bg-gradient-to-r from-primary to-primary/80 text-primary-foreground border-0">
               Active Comparison
             </Badge>
-            <Button variant="outline" size="sm" onClick={copyComparison}>
+            <Button variant="outline" size="sm" onClick={copyComparison} className="card-hover">
               <Copy className="w-4 h-4 mr-1" />
               Copy
             </Button>
             {onClearComparison && (
-              <Button variant="ghost" size="sm" onClick={onClearComparison}>
+              <Button variant="ghost" size="sm" onClick={onClearComparison} className="card-hover">
                 <RotateCcw className="w-4 h-4 mr-1" />
                 Clear
               </Button>
@@ -124,11 +123,11 @@ Difference: ${(scoreBValue - scoreAValue).toFixed(2)}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-7xl">
         {/* Scenario A */}
         <div className={cn("flex flex-col gap-4 transition-all duration-300", !scoreA && "opacity-50 scale-95")}>
-          <Card className="animate-fade-in border-l-4 border-l-blue-500 dark:border-l-blue-400 shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader className="pb-3">
+          <Card className="animate-slide-up card-hover border border-primary/20 shadow-lg bg-card/50 backdrop-blur-sm">
+            <CardHeader className="pb-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-bold flex items-center justify-center">A</div>
-                <span className="text-blue-700 dark:text-blue-300">Scenario A</span>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs font-bold flex items-center justify-center">A</div>
+                <span className="text-primary">Scenario A</span>
                 {scoreA && <span className="text-muted-foreground">: {scoreA.label}</span>}
               </CardTitle>
             </CardHeader>
@@ -136,7 +135,7 @@ Difference: ${(scoreBValue - scoreAValue).toFixed(2)}
               {scoreA?.results ? (
                 <div className="space-y-4">
                   <DashboardSummary data={scoreA.data} results={scoreA.results} />
-                  <Separator />
+                  <Separator className="bg-border/50" />
                   <MacroResults results={scoreA.results} />
                 </div>
               ) : (
@@ -152,11 +151,11 @@ Difference: ${(scoreBValue - scoreAValue).toFixed(2)}
 
         {/* Scenario B */}
         <div className={cn("flex flex-col gap-4 transition-all duration-300", !scoreB && "opacity-50 scale-95")}>
-          <Card className="animate-fade-in border-l-4 border-l-green-500 dark:border-l-green-400 shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader className="pb-3">
+          <Card className="animate-slide-up card-hover border border-primary/20 shadow-lg bg-card/50 backdrop-blur-sm">
+            <CardHeader className="pb-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold flex items-center justify-center">B</div>
-                <span className="text-green-700 dark:text-green-300">Scenario B</span>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs font-bold flex items-center justify-center">B</div>
+                <span className="text-primary">Scenario B</span>
                 {scoreB && <span className="text-muted-foreground">: {scoreB.label}</span>}
               </CardTitle>
             </CardHeader>
@@ -164,7 +163,7 @@ Difference: ${(scoreBValue - scoreAValue).toFixed(2)}
               {scoreB?.results ? (
                 <div className="space-y-4">
                   <DashboardSummary data={scoreB.data} results={scoreB.results} />
-                  <Separator />
+                  <Separator className="bg-border/50" />
                   <MacroResults results={scoreB.results} />
                 </div>
               ) : (
@@ -181,13 +180,13 @@ Difference: ${(scoreBValue - scoreAValue).toFixed(2)}
 
       {/* Enhanced Comparison Summary */}
       {hasComparison && (
-        <Card className="w-full max-w-5xl mt-8 animate-scale-in border-2 border-gradient-to-r from-blue-200 to-green-200 dark:from-blue-900/30 dark:to-green-900/30 shadow-xl">
-          <CardHeader className="text-center">
+        <Card className="w-full max-w-5xl mt-8 animate-slide-up card-hover border-2 border-primary/30 shadow-xl bg-card/80 backdrop-blur-sm">
+          <CardHeader className="text-center bg-gradient-to-r from-primary/10 to-primary/5 rounded-t-lg">
             <CardTitle className="flex items-center justify-center gap-3 text-xl">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-blue-100 to-green-100 dark:from-blue-900/20 dark:to-green-900/20">
-                <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                <div className="w-4 h-4 rounded-full bg-primary animate-pulse"></div>
                 <span className="text-sm font-medium">A vs B</span>
-                <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                <div className="w-4 h-4 rounded-full bg-primary animate-pulse"></div>
               </div>
               Detailed Comparison Analysis
             </CardTitle>
@@ -242,17 +241,17 @@ Difference: ${(scoreBValue - scoreAValue).toFixed(2)}
               </div>
             </div>
             
-            <Separator className="my-6" />
+            <Separator className="my-6 bg-border/50" />
             
             <div className="text-center">
-              <div className="inline-flex items-center gap-6 p-6 rounded-xl bg-gradient-to-r from-blue-50/50 to-green-50/50 dark:from-blue-950/20 dark:to-green-950/20 border border-muted">
+              <div className="inline-flex items-center gap-6 p-6 rounded-xl bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 animate-slide-up">
                 <div className="text-center">
                   <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Scenario A Trading Bias</div>
                   <Badge variant={getScoreValue(scoreA.results, 'trading_bias', 'bias') === 'BUY' ? 'default' : getScoreValue(scoreA.results, 'trading_bias', 'bias') === 'SELL' ? 'destructive' : 'secondary'} className="text-sm px-3 py-1">
                     {getScoreValue(scoreA.results, 'trading_bias', 'bias') || 'Unknown'}
                   </Badge>
                 </div>
-                <ArrowRight className="w-6 h-6 text-muted-foreground" />
+                <ArrowRight className="w-6 h-6 text-primary" />
                 <div className="text-center">
                   <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Scenario B Trading Bias</div>
                   <Badge variant={getScoreValue(scoreB.results, 'trading_bias', 'bias') === 'BUY' ? 'default' : getScoreValue(scoreB.results, 'trading_bias', 'bias') === 'SELL' ? 'destructive' : 'secondary'} className="text-sm px-3 py-1">
