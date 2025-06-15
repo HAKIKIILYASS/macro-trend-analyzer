@@ -114,80 +114,35 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Enhanced animated background with multiple layers */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950">
-        {/* Animated gradient orbs */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-1/4 -right-32 w-96 h-96 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute -bottom-32 left-1/3 w-72 h-72 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full blur-3xl animate-pulse delay-2000"></div>
-          <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-r from-teal-500 to-green-500 rounded-full blur-3xl animate-pulse delay-3000"></div>
-        </div>
-        
-        {/* Moving particles effect */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white rounded-full animate-ping"></div>
-          <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-blue-300 rounded-full animate-ping delay-1000"></div>
-          <div className="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-purple-300 rounded-full animate-ping delay-2000"></div>
-          <div className="absolute bottom-1/4 left-1/2 w-1 h-1 bg-cyan-300 rounded-full animate-ping delay-3000"></div>
-        </div>
-        
-        {/* Enhanced grid pattern with glow effect */}
-        <div className="absolute inset-0 opacity-[0.15]">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `
-              radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0),
-              linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '60px 60px, 60px 60px, 60px 60px'
-          }}></div>
-        </div>
-        
-        {/* Subtle noise texture overlay */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-        }}></div>
-      </div>
-
-      {/* Main content with enhanced glass morphism */}
-      <div className="relative z-10 p-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="p-4">
         <div className="max-w-7xl mx-auto">
-          {/* Enhanced header with better typography and glow effects */}
-          <div className="text-center mb-12">
-            <div className="relative inline-block">
-              <h1 className="text-6xl font-bold bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent mb-6 drop-shadow-2xl tracking-tight">
-                Macroeconomic Analysis Dashboard
-              </h1>
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-lg -z-10 rounded-lg"></div>
-            </div>
-            <p className="text-xl text-blue-50/90 max-w-3xl mx-auto font-medium leading-relaxed">
+          {/* Simple header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              Macroeconomic Analysis Dashboard
+            </h1>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Advanced economic indicators analysis with real-time macro scoring and trading bias assessment
             </p>
-            <div className="mt-4 flex justify-center space-x-2">
-              <div className="h-1 w-12 bg-gradient-to-r from-blue-400 to-transparent rounded-full"></div>
-              <div className="h-1 w-8 bg-gradient-to-r from-purple-400 to-transparent rounded-full"></div>
-              <div className="h-1 w-6 bg-gradient-to-r from-cyan-400 to-transparent rounded-full"></div>
-            </div>
           </div>
 
           {results && (
-            <div className="mb-12">
+            <div className="mb-8">
               <DashboardSummary data={data} results={results} />
             </div>
           )}
 
-          {/* Input cards with enhanced glass morphism */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
-            <div className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 shadow-2xl hover:bg-white/10 transition-all duration-300">
+          {/* Input cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-lg shadow border">
               <CentralBankInput 
                 value={data.cb_hawkish_index}
                 onChange={(value) => updateData('cb_hawkish_index', value)}
               />
             </div>
             
-            <div className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 shadow-2xl hover:bg-white/10 transition-all duration-300">
+            <div className="bg-white rounded-lg shadow border">
               <InflationInput 
                 cpi={data.cpi}
                 cpi_target={data.cpi_target}
@@ -198,7 +153,7 @@ const Index = () => {
               />
             </div>
             
-            <div className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 shadow-2xl hover:bg-white/10 transition-all duration-300">
+            <div className="bg-white rounded-lg shadow border">
               <LaborMarketInput 
                 current_nfp={data.current_nfp}
                 nfp_12m_values={data.nfp_12m_values}
@@ -207,7 +162,7 @@ const Index = () => {
               />
             </div>
             
-            <div className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 shadow-2xl hover:bg-white/10 transition-all duration-300">
+            <div className="bg-white rounded-lg shadow border">
               <RiskSentimentInput 
                 credit_spread_1m_change={data.credit_spread_1m_change}
                 vix={data.vix}
@@ -216,7 +171,7 @@ const Index = () => {
               />
             </div>
             
-            <div className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 shadow-2xl hover:bg-white/10 transition-all duration-300">
+            <div className="bg-white rounded-lg shadow border">
               <PMIInput 
                 pmi={data.pmi}
                 pmi_3y_values={data.pmi_3y_values}
@@ -225,7 +180,7 @@ const Index = () => {
               />
             </div>
             
-            <div className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 shadow-2xl hover:bg-white/10 transition-all duration-300">
+            <div className="bg-white rounded-lg shadow border">
               <CurrentAccountInput 
                 ca_gdp={data.ca_gdp}
                 ca_5y_values={data.ca_5y_values}
@@ -235,8 +190,8 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            <div className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 shadow-2xl hover:bg-white/10 transition-all duration-300">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div className="bg-white rounded-lg shadow border">
               <GeopoliticalInput 
                 gpr={data.gpr}
                 gpr_3y_values={data.gpr_3y_values}
@@ -245,24 +200,22 @@ const Index = () => {
               />
             </div>
             
-            <div className="flex items-center justify-center backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 shadow-2xl">
-              <div className="w-full max-w-md space-y-6 p-8">
+            <div className="flex items-center justify-center bg-white rounded-lg shadow border">
+              <div className="w-full max-w-md space-y-4 p-6">
                 <Button 
                   onClick={calculateScores}
-                  className="w-full h-16 text-lg font-bold bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 hover:from-blue-500 hover:via-blue-600 hover:to-indigo-600 shadow-2xl hover:shadow-blue-500/25 transition-all duration-500 border-0 rounded-xl backdrop-blur-sm"
+                  className="w-full h-12 text-lg font-semibold"
                 >
-                  <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
-                    Calculate Macro Score
-                  </span>
+                  Calculate Macro Score
                 </Button>
                 
                 {results && (
                   <Button 
                     onClick={() => setShowSaveDialog(true)}
                     variant="outline"
-                    className="w-full h-14 text-base font-semibold border-2 border-emerald-400/50 text-emerald-200 hover:bg-emerald-400/20 hover:text-white bg-transparent backdrop-blur-sm shadow-xl hover:shadow-emerald-500/25 transition-all duration-500 rounded-xl"
+                    className="w-full h-12 text-base font-semibold"
                   >
-                    <Save className="mr-2" size={20} />
+                    <Save className="mr-2" size={18} />
                     Save with Custom Name
                   </Button>
                 )}
@@ -275,7 +228,7 @@ const Index = () => {
               <MacroResults results={results} />
               
               <div>
-                <h2 className="text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent mb-8 text-center">
+                <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
                   Data Visualization
                 </h2>
                 <DataVisualization data={data} />
@@ -285,7 +238,7 @@ const Index = () => {
             </div>
           )}
 
-          <div className="mt-16">
+          <div className="mt-12">
             <SavedScores onLoadScore={handleLoadScore} />
           </div>
 
