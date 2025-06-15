@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -65,11 +66,7 @@ const Index = () => {
 
   const [results, setResults] = useState(null);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
-
-  // For recent sidebar/drawer
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // For compare: store chosen A/B states
   const [compareA, setCompareA] = useState<{ label: string, data: any, results: any } | null>(null);
   const [compareB, setCompareB] = useState<{ label: string, data: any, results: any } | null>(null);
 
@@ -116,7 +113,7 @@ const Index = () => {
 
   const handleLoadScore = (loadedData: MacroData) => {
     setData(loadedData);
-    setResults(null); // Clear current results when loading new data
+    setResults(null);
     toast({
       title: "Score loaded successfully!",
       description: "The saved data has been loaded. Click 'Calculate Macro Score' to recalculate.",
@@ -124,7 +121,6 @@ const Index = () => {
   };
 
   const handleCompare = (score: any, slot: "A" | "B") => {
-    // Try to recalc results using macro data formula
     let results;
     try {
       results = calculateMacroScore(score.data);
@@ -133,17 +129,29 @@ const Index = () => {
     }
     const obj = { label: score.name, data: score.data, results };
     slot === "A" ? setCompareA(obj) : setCompareB(obj);
+    
+    toast({
+      title: `Scenario ${slot} set!`,
+      description: `"${score.name}" is now in comparison slot ${slot}.`,
+    });
+  };
+
+  const clearComparison = () => {
+    setCompareA(null);
+    setCompareB(null);
+    toast({
+      title: "Comparison cleared",
+      description: "Both scenarios have been removed from comparison.",
+    });
   };
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-all duration-300">
-        {/* Theme switch top right */}
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-50 via-blue-50/30 to-green-50/30 dark:from-gray-900 dark:via-blue-950/20 dark:to-green-950/20 transition-all duration-500">
         <div className="fixed right-4 top-4 z-50">
           <ThemeSwitcher />
         </div>
 
-        {/* Sidebar (always open desktop; drawer on mobile) */}
         <div className="fixed left-0 top-0 h-screen z-40">
           <RecentActivitySidebar
             open={sidebarOpen}
@@ -153,10 +161,8 @@ const Index = () => {
           />
         </div>
 
-        {/* Content grid, shift right if sidebar open */}
         <div className={`flex-1 p-4 transition-all duration-200 ${sidebarOpen ? "md:ml-72" : ""}`}>
           <div className="max-w-7xl mx-auto">
-            {/* Simple header */}
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-50 dark:to-gray-300 bg-clip-text text-transparent mb-4 animate-fade-in">
                 Macroeconomic Analysis Dashboard
@@ -166,13 +172,15 @@ const Index = () => {
               </p>
             </div>
 
-            {/* Server Status */}
             <div className="flex justify-center mb-6 animate-scale-in">
               <ServerStatus />
             </div>
 
-            {/* Score compare grid */}
-            <ScoreCompare scoreA={compareA} scoreB={compareB} />
+            <ScoreCompare 
+              scoreA={compareA} 
+              scoreB={compareB} 
+              onClearComparison={clearComparison}
+            />
 
             {results && (
               <div className="mb-8 animate-fade-in">
@@ -232,7 +240,6 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Geopolitical and Action cards - Better layout, animated */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               <div className="lg:col-span-2 animate-scale-in">
                 <GeopoliticalInput 
@@ -271,7 +278,7 @@ const Index = () => {
               <div className="space-y-8">
                 <MacroResults results={results} />
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center animate-fade-in">
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-50 mb-6 text-center animate-fade-in">
                     Data Visualization
                   </h2>
                   <DataVisualization data={data} />
@@ -297,5 +304,3 @@ const Index = () => {
 };
 
 export default Index;
-
-// Reminder: file is very long (over 260 lines). Consider refactoring into smaller files for maintainability.

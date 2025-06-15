@@ -3,14 +3,17 @@ import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import MacroResults from "@/components/MacroResults";
 import DashboardSummary from "@/components/DashboardSummary";
 import { cn } from "@/lib/utils";
-import { TrendingUp, TrendingDown, Minus, ArrowRight } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, ArrowRight, RotateCcw, Copy } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ScoreCompareProps {
   scoreA: { label: string, data: any, results: any } | null;
   scoreB: { label: string, data: any, results: any } | null;
+  onClearComparison?: () => void;
 }
 
 const ComparisonMetric = ({ label, valueA, valueB, format = "number" }: {
@@ -31,24 +34,24 @@ const ComparisonMetric = ({ label, valueA, valueB, format = "number" }: {
   
   const getDiffIcon = () => {
     if (Math.abs(diff) < 0.01) return <Minus className="w-4 h-4 text-muted-foreground" />;
-    return diff > 0 ? <TrendingUp className="w-4 h-4 text-green-500" /> : <TrendingDown className="w-4 h-4 text-red-500" />;
+    return diff > 0 ? <TrendingUp className="w-4 h-4 text-emerald-500" /> : <TrendingDown className="w-4 h-4 text-red-500" />;
   };
   
   const getDiffColor = () => {
     if (Math.abs(diff) < 0.01) return "text-muted-foreground";
-    return diff > 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400";
+    return diff > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400";
   };
 
   return (
-    <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-muted/30">
-      <span className="text-sm font-medium">{label}</span>
-      <div className="flex items-center gap-2">
-        <span className="text-sm">{formatValue(valueA)}</span>
+    <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-200 border border-transparent hover:border-muted-foreground/10">
+      <span className="text-sm font-medium text-foreground">{label}</span>
+      <div className="flex items-center gap-3">
+        <span className="text-sm font-mono">{formatValue(valueA)}</span>
         <ArrowRight className="w-3 h-3 text-muted-foreground" />
-        <span className="text-sm">{formatValue(valueB)}</span>
-        <div className="flex items-center gap-1 ml-2">
+        <span className="text-sm font-mono">{formatValue(valueB)}</span>
+        <div className="flex items-center gap-1 ml-3 min-w-[60px] justify-end">
           {getDiffIcon()}
-          <span className={cn("text-xs font-medium", getDiffColor())}>
+          <span className={cn("text-xs font-medium font-mono", getDiffColor())}>
             {format === "percentage" ? `${diff.toFixed(1)}pp` : `${diff > 0 ? '+' : ''}${diff.toFixed(2)}`}
           </span>
         </div>
@@ -57,28 +60,61 @@ const ComparisonMetric = ({ label, valueA, valueB, format = "number" }: {
   );
 };
 
-export default function ScoreCompare({ scoreA, scoreB }: ScoreCompareProps) {
+export default function ScoreCompare({ scoreA, scoreB, onClearComparison }: ScoreCompareProps) {
   const hasComparison = scoreA && scoreB && scoreA.results && scoreB.results;
+  const { toast } = useToast();
+
+  const copyComparison = () => {
+    if (!hasComparison) return;
+    
+    const comparisonText = `
+Scenario Comparison:
+A: ${scoreA.label} (Score: ${scoreA.results.overall_score.toFixed(2)}, Bias: ${scoreA.results.trading_bias})
+B: ${scoreB.label} (Score: ${scoreB.results.overall_score.toFixed(2)}, Bias: ${scoreB.results.trading_bias})
+Difference: ${(scoreB.results.overall_score - scoreA.results.overall_score).toFixed(2)}
+    `;
+    
+    navigator.clipboard.writeText(comparisonText);
+    toast({
+      title: "Comparison copied!",
+      description: "The comparison summary has been copied to your clipboard.",
+    });
+  };
 
   return (
     <div className="w-full flex flex-col items-center mb-8">
-      <div className="flex items-center gap-2 mb-6">
-        <h2 className="text-2xl font-bold text-center">Compare Scenarios</h2>
+      <div className="flex items-center gap-4 mb-6">
+        <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+          Compare Scenarios
+        </h2>
         {hasComparison && (
-          <Badge variant="secondary" className="animate-pulse">
-            Active Comparison
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="default" className="animate-pulse bg-gradient-to-r from-blue-500 to-green-500 text-white">
+              Active Comparison
+            </Badge>
+            <Button variant="outline" size="sm" onClick={copyComparison}>
+              <Copy className="w-4 h-4 mr-1" />
+              Copy
+            </Button>
+            {onClearComparison && (
+              <Button variant="ghost" size="sm" onClick={onClearComparison}>
+                <RotateCcw className="w-4 h-4 mr-1" />
+                Clear
+              </Button>
+            )}
+          </div>
         )}
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-7xl">
         {/* Scenario A */}
-        <div className={cn("flex flex-col gap-4", !scoreA && "opacity-60")}>
-          <Card className="animate-fade-in border-l-4 border-l-blue-500 dark:border-l-blue-400">
+        <div className={cn("flex flex-col gap-4 transition-all duration-300", !scoreA && "opacity-50 scale-95")}>
+          <Card className="animate-fade-in border-l-4 border-l-blue-500 dark:border-l-blue-400 shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center">A</div>
-                Scenario A {scoreA ? `: ${scoreA.label}` : ""}
+                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-bold flex items-center justify-center">A</div>
+                <span className="text-blue-700 dark:text-blue-300">Scenario A</span>
+                {scoreA && <span className="text-muted-foreground">: {scoreA.label}</span>}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -89,10 +125,10 @@ export default function ScoreCompare({ scoreA, scoreB }: ScoreCompareProps) {
                   <MacroResults results={scoreA.results} />
                 </div>
               ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <div className="text-4xl mb-2">📊</div>
-                  <div className="text-sm">No scenario selected</div>
-                  <div className="text-xs mt-1">Choose from recent activity</div>
+                <div className="text-center py-16 text-muted-foreground">
+                  <div className="text-5xl mb-4 opacity-60">📊</div>
+                  <div className="text-lg font-medium mb-1">No scenario selected</div>
+                  <div className="text-sm">Choose from recent activity sidebar</div>
                 </div>
               )}
             </CardContent>
@@ -100,12 +136,13 @@ export default function ScoreCompare({ scoreA, scoreB }: ScoreCompareProps) {
         </div>
 
         {/* Scenario B */}
-        <div className={cn("flex flex-col gap-4", !scoreB && "opacity-60")}>
-          <Card className="animate-fade-in border-l-4 border-l-green-500 dark:border-l-green-400">
+        <div className={cn("flex flex-col gap-4 transition-all duration-300", !scoreB && "opacity-50 scale-95")}>
+          <Card className="animate-fade-in border-l-4 border-l-green-500 dark:border-l-green-400 shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-green-500 text-white text-xs font-bold flex items-center justify-center">B</div>
-                Scenario B {scoreB ? `: ${scoreB.label}` : ""}
+                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold flex items-center justify-center">B</div>
+                <span className="text-green-700 dark:text-green-300">Scenario B</span>
+                {scoreB && <span className="text-muted-foreground">: {scoreB.label}</span>}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -116,10 +153,10 @@ export default function ScoreCompare({ scoreA, scoreB }: ScoreCompareProps) {
                   <MacroResults results={scoreB.results} />
                 </div>
               ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <div className="text-4xl mb-2">📈</div>
-                  <div className="text-sm">No scenario selected</div>
-                  <div className="text-xs mt-1">Choose from recent activity</div>
+                <div className="text-center py-16 text-muted-foreground">
+                  <div className="text-5xl mb-4 opacity-60">📈</div>
+                  <div className="text-lg font-medium mb-1">No scenario selected</div>
+                  <div className="text-sm">Choose from recent activity sidebar</div>
                 </div>
               )}
             </CardContent>
@@ -127,24 +164,23 @@ export default function ScoreCompare({ scoreA, scoreB }: ScoreCompareProps) {
         </div>
       </div>
 
-      {/* Comparison Summary */}
+      {/* Enhanced Comparison Summary */}
       {hasComparison && (
-        <Card className="w-full max-w-4xl mt-8 animate-scale-in border-2 border-primary/20 dark:border-primary/30">
-          <CardHeader>
-            <CardTitle className="text-center flex items-center justify-center gap-2">
-              <div className="flex items-center gap-1">
+        <Card className="w-full max-w-5xl mt-8 animate-scale-in border-2 border-gradient-to-r from-blue-200 to-green-200 dark:from-blue-900/30 dark:to-green-900/30 shadow-xl">
+          <CardHeader className="text-center">
+            <CardTitle className="flex items-center justify-center gap-3 text-xl">
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-blue-100 to-green-100 dark:from-blue-900/20 dark:to-green-900/20">
                 <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-                <span className="text-sm">A vs</span>
+                <span className="text-sm font-medium">A vs B</span>
                 <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                <span className="text-sm">B</span>
               </div>
-              Comparison Analysis
+              Detailed Comparison Analysis
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Key Metrics</h4>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-4">Performance Metrics</h4>
                 <ComparisonMetric 
                   label="Overall Score" 
                   valueA={scoreA.results.overall_score} 
@@ -166,8 +202,8 @@ export default function ScoreCompare({ scoreA, scoreB }: ScoreCompareProps) {
                   valueB={scoreB.results.labor_score} 
                 />
               </div>
-              <div className="space-y-2">
-                <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Risk Metrics</h4>
+              <div className="space-y-3">
+                <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-4">Risk Assessment</h4>
                 <ComparisonMetric 
                   label="Risk Score" 
                   valueA={scoreA.results.risk_score} 
@@ -194,17 +230,17 @@ export default function ScoreCompare({ scoreA, scoreB }: ScoreCompareProps) {
             <Separator className="my-6" />
             
             <div className="text-center">
-              <div className="inline-flex items-center gap-4 p-4 rounded-lg bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-950/20 dark:to-green-950/20 border">
+              <div className="inline-flex items-center gap-6 p-6 rounded-xl bg-gradient-to-r from-blue-50/50 to-green-50/50 dark:from-blue-950/20 dark:to-green-950/20 border border-muted">
                 <div className="text-center">
-                  <div className="text-xs text-muted-foreground">Scenario A Bias</div>
-                  <Badge variant={scoreA.results.trading_bias === 'BUY' ? 'default' : scoreA.results.trading_bias === 'SELL' ? 'destructive' : 'secondary'}>
+                  <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Scenario A Trading Bias</div>
+                  <Badge variant={scoreA.results.trading_bias === 'BUY' ? 'default' : scoreA.results.trading_bias === 'SELL' ? 'destructive' : 'secondary'} className="text-sm px-3 py-1">
                     {scoreA.results.trading_bias}
                   </Badge>
                 </div>
-                <ArrowRight className="w-5 h-5 text-muted-foreground" />
+                <ArrowRight className="w-6 h-6 text-muted-foreground" />
                 <div className="text-center">
-                  <div className="text-xs text-muted-foreground">Scenario B Bias</div>
-                  <Badge variant={scoreB.results.trading_bias === 'BUY' ? 'default' : scoreB.results.trading_bias === 'SELL' ? 'destructive' : 'secondary'}>
+                  <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Scenario B Trading Bias</div>
+                  <Badge variant={scoreB.results.trading_bias === 'BUY' ? 'default' : scoreB.results.trading_bias === 'SELL' ? 'destructive' : 'secondary'} className="text-sm px-3 py-1">
                     {scoreB.results.trading_bias}
                   </Badge>
                 </div>

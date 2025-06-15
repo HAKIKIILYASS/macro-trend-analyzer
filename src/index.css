@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
+/* Enhanced Design System with Better Dark Mode Support */
 
 @layer base {
   :root {
@@ -92,17 +92,19 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
-/* Dark mode improvements */
+/* Enhanced Dark Mode Improvements */
 .dark {
   color-scheme: dark;
 }
 
+/* Improved contrast and readability in dark mode */
 .dark .bg-gray-50 {
-  @apply bg-gray-900;
+  @apply bg-gray-900/90;
 }
 
 .dark .text-gray-900 {
@@ -113,14 +115,90 @@
   @apply text-gray-300;
 }
 
-.dark .border-gray-200 {
-  @apply border-gray-700;
+.dark .text-gray-700 {
+  @apply text-gray-200;
 }
 
+.dark .border-gray-200 {
+  @apply border-gray-700/60;
+}
+
+.dark .border-gray-300 {
+  @apply border-gray-600/60;
+}
+
+/* Enhanced shadows for dark mode */
 .dark .shadow-lg {
-  @apply shadow-2xl shadow-black/20;
+  @apply shadow-2xl shadow-black/30;
 }
 
 .dark .shadow-md {
-  @apply shadow-xl shadow-black/20;
+  @apply shadow-xl shadow-black/25;
+}
+
+.dark .shadow-sm {
+  @apply shadow-lg shadow-black/20;
+}
+
+/* Improved card styling in dark mode */
+.dark .bg-white {
+  @apply bg-gray-800/90 backdrop-blur-sm;
+}
+
+.dark .bg-gradient-to-br {
+  background: linear-gradient(to bottom right, 
+    theme('colors.gray.800'), 
+    theme('colors.gray.900')
+  );
+}
+
+/* Enhanced hover states for dark mode */
+.dark .hover\:bg-gray-50:hover {
+  @apply bg-gray-800/60;
+}
+
+.dark .hover\:bg-gray-100:hover {
+  @apply bg-gray-700/60;
+}
+
+/* Better focus rings in dark mode */
+.dark .focus\:ring-2:focus {
+  @apply ring-blue-400/50;
+}
+
+/* Scrollbar styling for dark mode */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  @apply bg-gray-800;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-gray-600 rounded-lg;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}
+
+/* Enhanced gradients for dark mode backgrounds */
+.dark .bg-gradient-to-br.from-gray-50.to-gray-100 {
+  background: linear-gradient(to bottom right, 
+    theme('colors.gray.900'), 
+    theme('colors.gray.800')
+  );
+}
+
+/* Better selection colors in dark mode */
+.dark ::selection {
+  @apply bg-blue-600/30 text-blue-100;
+}
+
+/* Improved placeholder text in dark mode */
+.dark input::placeholder,
+.dark textarea::placeholder {
+  @apply text-gray-500;
 }
