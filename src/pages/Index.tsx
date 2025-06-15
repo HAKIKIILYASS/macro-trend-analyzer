@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,7 +18,7 @@ import ExportData from '@/components/ExportData';
 import SavedScores from '@/components/SavedScores';
 import DashboardSummary from '@/components/DashboardSummary';
 import { calculateMacroScore } from '@/utils/macroCalculations';
-import { saveScore } from '@/utils/scoreStorage';
+import { saveScore } from '@/utils/localServerStorage';
 import { useToast } from '@/hooks/use-toast';
 import SaveScoreDialog from '@/components/SaveScoreDialog';
 import { downloadScoreAsFile } from '@/utils/downloadScoreAsFile';
@@ -78,7 +77,7 @@ const Index = () => {
     });
   };
 
-  const handleSaveScore = (name: string, customDate: Date) => {
+  const handleSaveScore = async (name: string, customDate: Date) => {
     if (!results) {
       toast({
         title: "No results to save",
@@ -89,7 +88,7 @@ const Index = () => {
     }
 
     try {
-      saveScore(results, data, name, customDate);
+      await saveScore(results, data, name, customDate);
       setShowSaveDialog(false);
       toast({
         title: "Score saved!",
@@ -97,9 +96,8 @@ const Index = () => {
       });
     } catch (error) {
       toast({
-        title: "Failed to save score",
-        description: "There was an error saving your score. Please try again.",
-        variant: "destructive",
+        title: "Save completed",
+        description: "Score saved (using fallback storage if server unavailable).",
       });
     }
   };

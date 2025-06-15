@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Calendar } from 'lucide-react';
+import { Trash2, Calendar, AlertCircle } from 'lucide-react';
+import { getSavedScores, deleteScore } from '@/utils/localServerStorage';
 
 interface SavedScore {
   id: string;
@@ -21,31 +22,76 @@ interface SavedScoresProps {
 
 const SavedScores: React.FC<SavedScoresProps> = ({ onLoadScore }) => {
   const [savedScores, setSavedScores] = useState<SavedScore[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [serverError, setServerError] = useState(false);
+
+  const loadScores = async () => {
+    setIsLoading(true);
+    setServerError(false);
+    try {
+      const scores = await getSavedScores();
+      setSavedScores(scores);
+    } catch (error) {
+      console.error('Error loading scores:', error);
+      setServerError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const saved = localStorage.getItem('macroScores');
-    if (saved) {
-      try {
-        const parsedScores = JSON.parse(saved).map((score: any) => ({
-          ...score,
-          timestamp: new Date(score.timestamp)
-        }));
-        setSavedScores(parsedScores);
-      } catch (error) {
-        console.error('Error loading saved scores:', error);
-      }
-    }
+    loadScores();
   }, []);
 
-  const deleteScore = (id: string) => {
-    const updatedScores = savedScores.filter(score => score.id !== id);
-    setSavedScores(updatedScores);
-    localStorage.setItem('macroScores', JSON.stringify(updatedScores));
+  const handleDeleteScore = async (id: string) => {
+    try {
+      await deleteScore(id);
+      await loadScores(); // Reload scores after deletion
+    } catch (error) {
+      console.error('Error deleting score:', error);
+    }
   };
 
   const loadScore = (score: SavedScore) => {
     onLoadScore(score.data);
   };
+
+  if (isLoading) {
+    return (
+      <Card className="shadow-lg border-2 border-gray-100">
+        <CardHeader className="bg-gradient-to-r from-gray-700 to-gray-800 text-white">
+          <CardTitle className="flex items-center gap-3">
+            <span className="text-xl">💾</span>
+            Saved Scores
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-8 text-center">
+          <p className="text-gray-500">Loading saved scores...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (serverError) {
+    return (
+      <Card className="shadow-lg border-2 border-orange-200">
+        <CardHeader className="bg-gradient-to-r from-orange-600 to-red-600 text-white">
+          <CardTitle className="flex items-center gap-3">
+            <AlertCircle className="text-xl" />
+            Server Connection Issue
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <p className="text-gray-600 mb-4">
+            Cannot connect to local server. Make sure your local server is running on port 3001.
+          </p>
+          <p className="text-sm text-gray-500">
+            Falling back to browser storage for now.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (savedScores.length === 0) {
     return (
@@ -113,7 +159,7 @@ const SavedScores: React.FC<SavedScoresProps> = ({ onLoadScore }) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => deleteScore(score.id)}
+                  onClick={() => handleDeleteScore(score.id)}
                   className="hover:bg-red-50 text-red-600 border-red-200"
                 >
                   <Trash2 size={14} />

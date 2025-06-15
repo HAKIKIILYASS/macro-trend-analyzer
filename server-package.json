@@ -1,0 +1,18 @@
+
+{
+  "name": "macro-analysis-local-server",
+  "version": "1.0.0",
+  "description": "Local server for storing macro analysis data",
+  "main": "local-server.js",
+  "scripts": {
+    "start": "node local-server.js",
+    "dev": "nodemon local-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
