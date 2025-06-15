@@ -18,16 +18,20 @@ interface ScoreCompareProps {
 
 const ComparisonMetric = ({ label, valueA, valueB, format = "number" }: {
   label: string;
-  valueA: number | null;
-  valueB: number | null;
+  valueA: number | null | undefined;
+  valueB: number | null | undefined;
   format?: "number" | "percentage";
 }) => {
-  if (valueA === null || valueB === null) return null;
+  // Enhanced null/undefined checks
+  if (valueA == null || valueB == null || valueA === undefined || valueB === undefined) {
+    return null;
+  }
   
   const diff = valueB - valueA;
   const percentDiff = valueA !== 0 ? ((diff / Math.abs(valueA)) * 100) : 0;
   
   const formatValue = (val: number) => {
+    if (val == null || val === undefined) return "N/A";
     if (format === "percentage") return `${val.toFixed(1)}%`;
     return val.toFixed(2);
   };
@@ -67,11 +71,16 @@ export default function ScoreCompare({ scoreA, scoreB, onClearComparison }: Scor
   const copyComparison = () => {
     if (!hasComparison) return;
     
+    const scoreAValue = scoreA.results.overall_score || scoreA.results.total_score || 0;
+    const scoreBValue = scoreB.results.overall_score || scoreB.results.total_score || 0;
+    const biasA = scoreA.results.trading_bias || scoreA.results.bias || 'Unknown';
+    const biasB = scoreB.results.trading_bias || scoreB.results.bias || 'Unknown';
+    
     const comparisonText = `
 Scenario Comparison:
-A: ${scoreA.label} (Score: ${scoreA.results.overall_score.toFixed(2)}, Bias: ${scoreA.results.trading_bias})
-B: ${scoreB.label} (Score: ${scoreB.results.overall_score.toFixed(2)}, Bias: ${scoreB.results.trading_bias})
-Difference: ${(scoreB.results.overall_score - scoreA.results.overall_score).toFixed(2)}
+A: ${scoreA.label} (Score: ${scoreAValue.toFixed(2)}, Bias: ${biasA})
+B: ${scoreB.label} (Score: ${scoreBValue.toFixed(2)}, Bias: ${biasB})
+Difference: ${(scoreBValue - scoreAValue).toFixed(2)}
     `;
     
     navigator.clipboard.writeText(comparisonText);
@@ -79,6 +88,12 @@ Difference: ${(scoreB.results.overall_score - scoreA.results.overall_score).toFi
       title: "Comparison copied!",
       description: "The comparison summary has been copied to your clipboard.",
     });
+  };
+
+  // Helper function to safely get score values
+  const getScoreValue = (results: any, primaryKey: string, fallbackKey?: string) => {
+    if (!results) return null;
+    return results[primaryKey] ?? (fallbackKey ? results[fallbackKey] : null);
   };
 
   return (
@@ -183,46 +198,46 @@ Difference: ${(scoreB.results.overall_score - scoreA.results.overall_score).toFi
                 <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-4">Performance Metrics</h4>
                 <ComparisonMetric 
                   label="Overall Score" 
-                  valueA={scoreA.results.overall_score} 
-                  valueB={scoreB.results.overall_score} 
+                  valueA={getScoreValue(scoreA.results, 'overall_score', 'total_score')} 
+                  valueB={getScoreValue(scoreB.results, 'overall_score', 'total_score')} 
                 />
                 <ComparisonMetric 
                   label="Central Bank Score" 
-                  valueA={scoreA.results.cb_score} 
-                  valueB={scoreB.results.cb_score} 
+                  valueA={getScoreValue(scoreA.results, 'cb_score')} 
+                  valueB={getScoreValue(scoreB.results, 'cb_score')} 
                 />
                 <ComparisonMetric 
                   label="Inflation Score" 
-                  valueA={scoreA.results.inflation_score} 
-                  valueB={scoreB.results.inflation_score} 
+                  valueA={getScoreValue(scoreA.results, 'inflation_score')} 
+                  valueB={getScoreValue(scoreB.results, 'inflation_score')} 
                 />
                 <ComparisonMetric 
                   label="Labor Score" 
-                  valueA={scoreA.results.labor_score} 
-                  valueB={scoreB.results.labor_score} 
+                  valueA={getScoreValue(scoreA.results, 'labor_score')} 
+                  valueB={getScoreValue(scoreB.results, 'labor_score')} 
                 />
               </div>
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-4">Risk Assessment</h4>
                 <ComparisonMetric 
                   label="Risk Score" 
-                  valueA={scoreA.results.risk_score} 
-                  valueB={scoreB.results.risk_score} 
+                  valueA={getScoreValue(scoreA.results, 'risk_score')} 
+                  valueB={getScoreValue(scoreB.results, 'risk_score')} 
                 />
                 <ComparisonMetric 
                   label="PMI Score" 
-                  valueA={scoreA.results.pmi_score} 
-                  valueB={scoreB.results.pmi_score} 
+                  valueA={getScoreValue(scoreA.results, 'pmi_score')} 
+                  valueB={getScoreValue(scoreB.results, 'pmi_score')} 
                 />
                 <ComparisonMetric 
                   label="Current Account Score" 
-                  valueA={scoreA.results.ca_score} 
-                  valueB={scoreB.results.ca_score} 
+                  valueA={getScoreValue(scoreA.results, 'ca_score')} 
+                  valueB={getScoreValue(scoreB.results, 'ca_score')} 
                 />
                 <ComparisonMetric 
                   label="Geopolitical Score" 
-                  valueA={scoreA.results.geo_score} 
-                  valueB={scoreB.results.geo_score} 
+                  valueA={getScoreValue(scoreA.results, 'geo_score')} 
+                  valueB={getScoreValue(scoreB.results, 'geo_score')} 
                 />
               </div>
             </div>
@@ -233,15 +248,15 @@ Difference: ${(scoreB.results.overall_score - scoreA.results.overall_score).toFi
               <div className="inline-flex items-center gap-6 p-6 rounded-xl bg-gradient-to-r from-blue-50/50 to-green-50/50 dark:from-blue-950/20 dark:to-green-950/20 border border-muted">
                 <div className="text-center">
                   <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Scenario A Trading Bias</div>
-                  <Badge variant={scoreA.results.trading_bias === 'BUY' ? 'default' : scoreA.results.trading_bias === 'SELL' ? 'destructive' : 'secondary'} className="text-sm px-3 py-1">
-                    {scoreA.results.trading_bias}
+                  <Badge variant={getScoreValue(scoreA.results, 'trading_bias', 'bias') === 'BUY' ? 'default' : getScoreValue(scoreA.results, 'trading_bias', 'bias') === 'SELL' ? 'destructive' : 'secondary'} className="text-sm px-3 py-1">
+                    {getScoreValue(scoreA.results, 'trading_bias', 'bias') || 'Unknown'}
                   </Badge>
                 </div>
                 <ArrowRight className="w-6 h-6 text-muted-foreground" />
                 <div className="text-center">
                   <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Scenario B Trading Bias</div>
-                  <Badge variant={scoreB.results.trading_bias === 'BUY' ? 'default' : scoreB.results.trading_bias === 'SELL' ? 'destructive' : 'secondary'} className="text-sm px-3 py-1">
-                    {scoreB.results.trading_bias}
+                  <Badge variant={getScoreValue(scoreB.results, 'trading_bias', 'bias') === 'BUY' ? 'default' : getScoreValue(scoreB.results, 'trading_bias', 'bias') === 'SELL' ? 'destructive' : 'secondary'} className="text-sm px-3 py-1">
+                    {getScoreValue(scoreB.results, 'trading_bias', 'bias') || 'Unknown'}
                   </Badge>
                 </div>
               </div>
