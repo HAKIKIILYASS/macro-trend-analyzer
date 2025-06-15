@@ -23,6 +23,9 @@ import { useToast } from '@/hooks/use-toast';
 import SaveScoreDialog from '@/components/SaveScoreDialog';
 import { downloadScoreAsFile } from '@/utils/downloadScoreAsFile';
 import ServerStatus from '@/components/ServerStatus';
+import RecentActivitySidebar from "@/components/RecentActivitySidebar";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
+import ScoreCompare from "@/components/ScoreCompare";
 
 export interface MacroData {
   cb_hawkish_index: number;
@@ -61,6 +64,13 @@ const Index = () => {
 
   const [results, setResults] = useState(null);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+
+  // For recent sidebar/drawer
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // For compare: store chosen A/B states
+  const [compareA, setCompareA] = useState<{ label: string, data: any, results: any } | null>(null);
+  const [compareB, setCompareB] = useState<{ label: string, data: any, results: any } | null>(null);
 
   const { toast } = useToast();
 
@@ -112,41 +122,71 @@ const Index = () => {
     });
   };
 
+  const handleCompare = (score: any, slot: "A" | "B") => {
+    // Try to recalc results using macro data formula
+    let results;
+    try {
+      results = calculateMacroScore(score.data);
+    } catch {
+      results = null;
+    }
+    const obj = { label: score.name, data: score.data, results };
+    slot === "A" ? setCompareA(obj) : setCompareB(obj);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-background transition-colors">
+      {/* Theme switch top right */}
+      <div className="fixed right-4 top-4 z-50">
+        <ThemeSwitcher />
+      </div>
+
+      {/* Sidebar (always open desktop; drawer on mobile) */}
+      <div className="fixed left-0 top-0 h-screen z-40">
+        <RecentActivitySidebar
+          open={sidebarOpen}
+          setOpen={setSidebarOpen}
+          onLoadScore={handleLoadScore}
+          onCompare={handleCompare}
+        />
+      </div>
+
+      {/* Content grid, shift right if sidebar open */}
+      <div className={`p-4 transition-all duration-200 ${sidebarOpen ? "md:ml-72" : ""}`}>
         <div className="max-w-7xl mx-auto">
           {/* Simple header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-4 animate-fade-in">
               Macroeconomic Analysis Dashboard
             </h1>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-600 dark:text-muted-foreground max-w-3xl mx-auto animate-fade-in">
               Advanced economic indicators analysis with real-time macro scoring and trading bias assessment
             </p>
           </div>
 
           {/* Server Status */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-6 animate-scale-in">
             <ServerStatus />
           </div>
 
+          {/* Score compare grid */}
+          <ScoreCompare scoreA={compareA} scoreB={compareB} />
+
           {results && (
-            <div className="mb-8">
+            <div className="mb-8 animate-fade-in">
               <DashboardSummary data={data} results={results} />
             </div>
           )}
 
-          {/* Input cards - Clean grid with consistent heights */}
+          {/* Input cards - Clean grid, animated mount */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-            <div className="h-full">
+            <div className="h-full animate-fade-in">
               <CentralBankInput 
                 value={data.cb_hawkish_index}
                 onChange={(value) => updateData('cb_hawkish_index', value)}
               />
             </div>
-            
-            <div className="h-full">
+            <div className="h-full animate-fade-in">
               <InflationInput 
                 cpi={data.cpi}
                 cpi_target={data.cpi_target}
@@ -156,8 +196,7 @@ const Index = () => {
                 onChange3M={(value) => updateData('cpi_3m_change', value)}
               />
             </div>
-            
-            <div className="h-full">
+            <div className="h-full animate-fade-in">
               <LaborMarketInput 
                 current_nfp={data.current_nfp}
                 nfp_12m_values={data.nfp_12m_values}
@@ -165,8 +204,7 @@ const Index = () => {
                 onValuesChange={(values) => updateData('nfp_12m_values', values)}
               />
             </div>
-            
-            <div className="h-full">
+            <div className="h-full animate-fade-in">
               <RiskSentimentInput 
                 credit_spread_1m_change={data.credit_spread_1m_change}
                 vix={data.vix}
@@ -174,8 +212,7 @@ const Index = () => {
                 onVixChange={(value) => updateData('vix', value)}
               />
             </div>
-            
-            <div className="h-full">
+            <div className="h-full animate-fade-in">
               <PMIInput 
                 pmi={data.pmi}
                 pmi_3y_values={data.pmi_3y_values}
@@ -183,8 +220,7 @@ const Index = () => {
                 onValuesChange={(values) => updateData('pmi_3y_values', values)}
               />
             </div>
-            
-            <div className="h-full">
+            <div className="h-full animate-fade-in">
               <CurrentAccountInput 
                 ca_gdp={data.ca_gdp}
                 ca_5y_values={data.ca_5y_values}
@@ -194,9 +230,9 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Geopolitical and Action cards - Better layout */}
+          {/* Geopolitical and Action cards - Better layout, animated */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 animate-scale-in">
               <GeopoliticalInput 
                 gpr={data.gpr}
                 gpr_3y_values={data.gpr_3y_values}
@@ -204,8 +240,7 @@ const Index = () => {
                 onValuesChange={(values) => updateData('gpr_3y_values', values)}
               />
             </div>
-            
-            <Card className="shadow-lg border border-gray-200">
+            <Card className="shadow-lg border border-gray-200 animate-scale-in">
               <CardContent className="h-full flex items-center justify-center p-6">
                 <div className="w-full space-y-4">
                   <Button 
@@ -233,14 +268,12 @@ const Index = () => {
           {results && (
             <div className="space-y-8">
               <MacroResults results={results} />
-              
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+                <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center animate-fade-in">
                   Data Visualization
                 </h2>
                 <DataVisualization data={data} />
               </div>
-              
               <ExportData data={data} results={results} />
             </div>
           )}
@@ -261,3 +294,5 @@ const Index = () => {
 };
 
 export default Index;
+
+// Reminder: file is very long (over 260 lines). Consider refactoring into smaller files for maintainability.
