@@ -50,11 +50,11 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
 
   // For desktop, always show. For mobile, show as overlay drawer.
   const Content = (
-    <SidebarContent>
+    <SidebarContent className="bg-background border-r border-border">
       <SidebarGroup>
-        <SidebarGroupLabel>
+        <SidebarGroupLabel className="text-foreground font-semibold">
           Recent Scores
-          <Button variant="ghost" size="icon" onClick={fetchScores} className="ml-1" title="Refresh" disabled={loading}>
+          <Button variant="ghost" size="icon" onClick={fetchScores} className="ml-1 hover:bg-accent" title="Refresh" disabled={loading}>
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
           </Button>
         </SidebarGroupLabel>
@@ -68,12 +68,12 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
             )}
             {!loading && scores.map((score, idx) => (
               <SidebarMenuItem key={score.id || idx} className="mb-2">
-                <div className="p-2 rounded-md border border-border hover:bg-accent/50 transition-colors">
+                <div className="p-3 rounded-lg border border-border bg-card hover:bg-accent/50 transition-all duration-200 shadow-sm">
                   <div 
                     onClick={(e) => handleLoadClick(score, e)}
-                    className="cursor-pointer mb-2 pb-2 border-b border-border/50"
+                    className="cursor-pointer mb-3 pb-2 border-b border-border/50 hover:border-border transition-colors"
                   >
-                    <div className="text-sm font-semibold truncate mb-1">{score.name}</div>
+                    <div className="text-sm font-semibold truncate mb-1 text-foreground">{score.name}</div>
                     <div className="text-xs text-muted-foreground mb-1">
                       Score: {score.totalScore?.toFixed(2) || 'N/A'} | {score.bias || 'Unknown'}
                     </div>
@@ -86,7 +86,7 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
                       size="sm" 
                       variant="outline" 
                       onClick={(e) => handleCompareClick(score, "A", e)}
-                      className="text-xs px-3 py-1 h-7 bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+                      className="text-xs px-3 py-1.5 h-8 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 transition-colors"
                     >
                       Set as A
                     </Button>
@@ -94,7 +94,7 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
                       size="sm" 
                       variant="outline" 
                       onClick={(e) => handleCompareClick(score, "B", e)}
-                      className="text-xs px-3 py-1 h-7 bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+                      className="text-xs px-3 py-1.5 h-8 bg-green-50 dark:bg-green-950/50 hover:bg-green-100 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800 transition-colors"
                     >
                       Set as B
                     </Button>
@@ -105,12 +105,14 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
-      <SidebarFooter>
-        <div className="text-xs text-muted-foreground text-center p-2">
-          <div className="font-medium mb-1">How to compare:</div>
-          <div>1. Click name to load scenario</div>
-          <div>2. Use "Set as A" and "Set as B" buttons</div>
-          <div>3. View comparison above</div>
+      <SidebarFooter className="border-t border-border bg-muted/30">
+        <div className="text-xs text-muted-foreground text-center p-3">
+          <div className="font-medium mb-2 text-foreground">How to compare:</div>
+          <div className="space-y-1">
+            <div>1. Click name to load scenario</div>
+            <div>2. Use "Set as A" and "Set as B" buttons</div>
+            <div>3. View comparison above</div>
+          </div>
         </div>
       </SidebarFooter>
     </SidebarContent>
@@ -118,7 +120,7 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
 
   if (!isMobile) {
     return (
-      <Sidebar className={`transition-all duration-200 ${open ? "translate-x-0" : "-translate-x-full"} shadow-md z-40 min-h-screen`}>
+      <Sidebar className={`transition-all duration-300 ${open ? "translate-x-0" : "-translate-x-full"} shadow-lg border-r border-border bg-background z-40 min-h-screen`}>
         {Content}
       </Sidebar>
     );
@@ -127,15 +129,17 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
   // Drawer overlay for mobile
   return (
     <div>
-      <Button variant="ghost" size="icon" onClick={() => setOpen(true)} className="fixed top-3 left-3 z-50 rounded-full bg-white/70 backdrop-blur-sm shadow-md">
+      <Button variant="ghost" size="icon" onClick={() => setOpen(true)} className="fixed top-3 left-3 z-50 rounded-full bg-background/90 dark:bg-background/90 backdrop-blur-sm shadow-lg border border-border hover:bg-accent transition-colors">
         <Menu size={22} />
       </Button>
       {open && (
-        <div className="fixed inset-0 z-50 bg-black/25" onClick={() => setOpen(false)}>
-          <div className="fixed left-0 top-0 h-full w-4/5 sm:w-80 bg-background shadow-2xl animate-slide-in-right" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center border-b px-3 py-2">
-              <span className="font-bold text-lg">Recent Activity</span>
-              <Button size="icon" variant="ghost" onClick={() => setOpen(false)}><X size={20} /></Button>
+        <div className="fixed inset-0 z-50 bg-black/50 dark:bg-black/70" onClick={() => setOpen(false)}>
+          <div className="fixed left-0 top-0 h-full w-4/5 sm:w-80 bg-background border-r border-border shadow-2xl animate-slide-in-right" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center border-b border-border px-4 py-3 bg-muted/30">
+              <span className="font-bold text-lg text-foreground">Recent Activity</span>
+              <Button size="icon" variant="ghost" onClick={() => setOpen(false)} className="hover:bg-accent">
+                <X size={20} />
+              </Button>
             </div>
             {Content}
           </div>
