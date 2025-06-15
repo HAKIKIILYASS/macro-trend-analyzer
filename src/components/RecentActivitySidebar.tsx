@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { getSavedScores } from "@/utils/localServerStorage";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarFooter } from "@/components/ui/sidebar";
@@ -53,8 +52,8 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
                       <span className="text-xs text-muted-foreground">{score.timestamp ? new Date(score.timestamp).toLocaleString() : ""}</span>
                     </div>
                     <div className="flex flex-col gap-1 w-1/3 items-end">
-                      <Button size="xs" variant="ghost" onClick={e => { e.stopPropagation(); onCompare(score, "A"); }}>A</Button>
-                      <Button size="xs" variant="ghost" onClick={e => { e.stopPropagation(); onCompare(score, "B"); }}>B</Button>
+                      <Button size="sm" variant="ghost" onClick={e => { e.stopPropagation(); onCompare(score, "A"); }}>A</Button>
+                      <Button size="sm" variant="ghost" onClick={e => { e.stopPropagation(); onCompare(score, "B"); }}>B</Button>
                     </div>
                   </div>
                 </SidebarMenuButton>

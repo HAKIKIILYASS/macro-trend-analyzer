@@ -26,6 +26,7 @@ import ServerStatus from '@/components/ServerStatus';
 import RecentActivitySidebar from "@/components/RecentActivitySidebar";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import ScoreCompare from "@/components/ScoreCompare";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 export interface MacroData {
   cb_hawkish_index: number;
@@ -135,161 +136,163 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-background transition-colors">
-      {/* Theme switch top right */}
-      <div className="fixed right-4 top-4 z-50">
-        <ThemeSwitcher />
-      </div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-gray-50 dark:bg-background transition-colors">
+        {/* Theme switch top right */}
+        <div className="fixed right-4 top-4 z-50">
+          <ThemeSwitcher />
+        </div>
 
-      {/* Sidebar (always open desktop; drawer on mobile) */}
-      <div className="fixed left-0 top-0 h-screen z-40">
-        <RecentActivitySidebar
-          open={sidebarOpen}
-          setOpen={setSidebarOpen}
-          onLoadScore={handleLoadScore}
-          onCompare={handleCompare}
-        />
-      </div>
-
-      {/* Content grid, shift right if sidebar open */}
-      <div className={`p-4 transition-all duration-200 ${sidebarOpen ? "md:ml-72" : ""}`}>
-        <div className="max-w-7xl mx-auto">
-          {/* Simple header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-4 animate-fade-in">
-              Macroeconomic Analysis Dashboard
-            </h1>
-            <p className="text-lg text-gray-600 dark:text-muted-foreground max-w-3xl mx-auto animate-fade-in">
-              Advanced economic indicators analysis with real-time macro scoring and trading bias assessment
-            </p>
-          </div>
-
-          {/* Server Status */}
-          <div className="flex justify-center mb-6 animate-scale-in">
-            <ServerStatus />
-          </div>
-
-          {/* Score compare grid */}
-          <ScoreCompare scoreA={compareA} scoreB={compareB} />
-
-          {results && (
-            <div className="mb-8 animate-fade-in">
-              <DashboardSummary data={data} results={results} />
-            </div>
-          )}
-
-          {/* Input cards - Clean grid, animated mount */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-            <div className="h-full animate-fade-in">
-              <CentralBankInput 
-                value={data.cb_hawkish_index}
-                onChange={(value) => updateData('cb_hawkish_index', value)}
-              />
-            </div>
-            <div className="h-full animate-fade-in">
-              <InflationInput 
-                cpi={data.cpi}
-                cpi_target={data.cpi_target}
-                cpi_3m_change={data.cpi_3m_change}
-                onCpiChange={(value) => updateData('cpi', value)}
-                onTargetChange={(value) => updateData('cpi_target', value)}
-                onChange3M={(value) => updateData('cpi_3m_change', value)}
-              />
-            </div>
-            <div className="h-full animate-fade-in">
-              <LaborMarketInput 
-                current_nfp={data.current_nfp}
-                nfp_12m_values={data.nfp_12m_values}
-                onCurrentChange={(value) => updateData('current_nfp', value)}
-                onValuesChange={(values) => updateData('nfp_12m_values', values)}
-              />
-            </div>
-            <div className="h-full animate-fade-in">
-              <RiskSentimentInput 
-                credit_spread_1m_change={data.credit_spread_1m_change}
-                vix={data.vix}
-                onCreditChange={(value) => updateData('credit_spread_1m_change', value)}
-                onVixChange={(value) => updateData('vix', value)}
-              />
-            </div>
-            <div className="h-full animate-fade-in">
-              <PMIInput 
-                pmi={data.pmi}
-                pmi_3y_values={data.pmi_3y_values}
-                onPmiChange={(value) => updateData('pmi', value)}
-                onValuesChange={(values) => updateData('pmi_3y_values', values)}
-              />
-            </div>
-            <div className="h-full animate-fade-in">
-              <CurrentAccountInput 
-                ca_gdp={data.ca_gdp}
-                ca_5y_values={data.ca_5y_values}
-                onCurrentChange={(value) => updateData('ca_gdp', value)}
-                onValuesChange={(values) => updateData('ca_5y_values', values)}
-              />
-            </div>
-          </div>
-
-          {/* Geopolitical and Action cards - Better layout, animated */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div className="lg:col-span-2 animate-scale-in">
-              <GeopoliticalInput 
-                gpr={data.gpr}
-                gpr_3y_values={data.gpr_3y_values}
-                onGprChange={(value) => updateData('gpr', value)}
-                onValuesChange={(values) => updateData('gpr_3y_values', values)}
-              />
-            </div>
-            <Card className="shadow-lg border border-gray-200 animate-scale-in">
-              <CardContent className="h-full flex items-center justify-center p-6">
-                <div className="w-full space-y-4">
-                  <Button 
-                    onClick={calculateScores}
-                    className="w-full h-12 text-lg font-semibold"
-                  >
-                    Calculate Macro Score
-                  </Button>
-                  
-                  {results && (
-                    <Button 
-                      onClick={() => setShowSaveDialog(true)}
-                      variant="outline"
-                      className="w-full h-12 text-base font-semibold"
-                    >
-                      <Save className="mr-2" size={18} />
-                      Save with Custom Name
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {results && (
-            <div className="space-y-8">
-              <MacroResults results={results} />
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center animate-fade-in">
-                  Data Visualization
-                </h2>
-                <DataVisualization data={data} />
-              </div>
-              <ExportData data={data} results={results} />
-            </div>
-          )}
-
-          <div className="mt-12">
-            <SavedScores onLoadScore={handleLoadScore} />
-          </div>
-
-          <SaveScoreDialog
-            isOpen={showSaveDialog}
-            onSave={handleSaveScore}
-            onCancel={() => setShowSaveDialog(false)}
+        {/* Sidebar (always open desktop; drawer on mobile) */}
+        <div className="fixed left-0 top-0 h-screen z-40">
+          <RecentActivitySidebar
+            open={sidebarOpen}
+            setOpen={setSidebarOpen}
+            onLoadScore={handleLoadScore}
+            onCompare={handleCompare}
           />
         </div>
+
+        {/* Content grid, shift right if sidebar open */}
+        <div className={`flex-1 p-4 transition-all duration-200 ${sidebarOpen ? "md:ml-72" : ""}`}>
+          <div className="max-w-7xl mx-auto">
+            {/* Simple header */}
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-4 animate-fade-in">
+                Macroeconomic Analysis Dashboard
+              </h1>
+              <p className="text-lg text-gray-600 dark:text-muted-foreground max-w-3xl mx-auto animate-fade-in">
+                Advanced economic indicators analysis with real-time macro scoring and trading bias assessment
+              </p>
+            </div>
+
+            {/* Server Status */}
+            <div className="flex justify-center mb-6 animate-scale-in">
+              <ServerStatus />
+            </div>
+
+            {/* Score compare grid */}
+            <ScoreCompare scoreA={compareA} scoreB={compareB} />
+
+            {results && (
+              <div className="mb-8 animate-fade-in">
+                <DashboardSummary data={data} results={results} />
+              </div>
+            )}
+
+            {/* Input cards - Clean grid, animated mount */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+              <div className="h-full animate-fade-in">
+                <CentralBankInput 
+                  value={data.cb_hawkish_index}
+                  onChange={(value) => updateData('cb_hawkish_index', value)}
+                />
+              </div>
+              <div className="h-full animate-fade-in">
+                <InflationInput 
+                  cpi={data.cpi}
+                  cpi_target={data.cpi_target}
+                  cpi_3m_change={data.cpi_3m_change}
+                  onCpiChange={(value) => updateData('cpi', value)}
+                  onTargetChange={(value) => updateData('cpi_target', value)}
+                  onChange3M={(value) => updateData('cpi_3m_change', value)}
+                />
+              </div>
+              <div className="h-full animate-fade-in">
+                <LaborMarketInput 
+                  current_nfp={data.current_nfp}
+                  nfp_12m_values={data.nfp_12m_values}
+                  onCurrentChange={(value) => updateData('current_nfp', value)}
+                  onValuesChange={(values) => updateData('nfp_12m_values', values)}
+                />
+              </div>
+              <div className="h-full animate-fade-in">
+                <RiskSentimentInput 
+                  credit_spread_1m_change={data.credit_spread_1m_change}
+                  vix={data.vix}
+                  onCreditChange={(value) => updateData('credit_spread_1m_change', value)}
+                  onVixChange={(value) => updateData('vix', value)}
+                />
+              </div>
+              <div className="h-full animate-fade-in">
+                <PMIInput 
+                  pmi={data.pmi}
+                  pmi_3y_values={data.pmi_3y_values}
+                  onPmiChange={(value) => updateData('pmi', value)}
+                  onValuesChange={(values) => updateData('pmi_3y_values', values)}
+                />
+              </div>
+              <div className="h-full animate-fade-in">
+                <CurrentAccountInput 
+                  ca_gdp={data.ca_gdp}
+                  ca_5y_values={data.ca_5y_values}
+                  onCurrentChange={(value) => updateData('ca_gdp', value)}
+                  onValuesChange={(values) => updateData('ca_5y_values', values)}
+                />
+              </div>
+            </div>
+
+            {/* Geopolitical and Action cards - Better layout, animated */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              <div className="lg:col-span-2 animate-scale-in">
+                <GeopoliticalInput 
+                  gpr={data.gpr}
+                  gpr_3y_values={data.gpr_3y_values}
+                  onGprChange={(value) => updateData('gpr', value)}
+                  onValuesChange={(values) => updateData('gpr_3y_values', values)}
+                />
+              </div>
+              <Card className="shadow-lg border border-gray-200 animate-scale-in">
+                <CardContent className="h-full flex items-center justify-center p-6">
+                  <div className="w-full space-y-4">
+                    <Button 
+                      onClick={calculateScores}
+                      className="w-full h-12 text-lg font-semibold"
+                    >
+                      Calculate Macro Score
+                    </Button>
+                    
+                    {results && (
+                      <Button 
+                        onClick={() => setShowSaveDialog(true)}
+                        variant="outline"
+                        className="w-full h-12 text-base font-semibold"
+                      >
+                        <Save className="mr-2" size={18} />
+                        Save with Custom Name
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {results && (
+              <div className="space-y-8">
+                <MacroResults results={results} />
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center animate-fade-in">
+                    Data Visualization
+                  </h2>
+                  <DataVisualization data={data} />
+                </div>
+                <ExportData data={data} results={results} />
+              </div>
+            )}
+
+            <div className="mt-12">
+              <SavedScores onLoadScore={handleLoadScore} />
+            </div>
+
+            <SaveScoreDialog
+              isOpen={showSaveDialog}
+              onSave={handleSaveScore}
+              onCancel={() => setShowSaveDialog(false)}
+            />
+          </div>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
