@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -138,16 +137,16 @@ const Index = () => {
             </div>
           )}
 
-          {/* Input cards - Fixed grid with consistent heights */}
+          {/* Input cards - Clean grid with consistent heights */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow border h-full">
+            <div className="h-full">
               <CentralBankInput 
                 value={data.cb_hawkish_index}
                 onChange={(value) => updateData('cb_hawkish_index', value)}
               />
             </div>
             
-            <div className="bg-white rounded-lg shadow border h-full">
+            <div className="h-full">
               <InflationInput 
                 cpi={data.cpi}
                 cpi_target={data.cpi_target}
@@ -158,7 +157,7 @@ const Index = () => {
               />
             </div>
             
-            <div className="bg-white rounded-lg shadow border h-full">
+            <div className="h-full">
               <LaborMarketInput 
                 current_nfp={data.current_nfp}
                 nfp_12m_values={data.nfp_12m_values}
@@ -167,7 +166,7 @@ const Index = () => {
               />
             </div>
             
-            <div className="bg-white rounded-lg shadow border h-full">
+            <div className="h-full">
               <RiskSentimentInput 
                 credit_spread_1m_change={data.credit_spread_1m_change}
                 vix={data.vix}
@@ -176,7 +175,7 @@ const Index = () => {
               />
             </div>
             
-            <div className="bg-white rounded-lg shadow border h-full">
+            <div className="h-full">
               <PMIInput 
                 pmi={data.pmi}
                 pmi_3y_values={data.pmi_3y_values}
@@ -185,7 +184,7 @@ const Index = () => {
               />
             </div>
             
-            <div className="bg-white rounded-lg shadow border h-full">
+            <div className="h-full">
               <CurrentAccountInput 
                 ca_gdp={data.ca_gdp}
                 ca_5y_values={data.ca_5y_values}
@@ -197,7 +196,7 @@ const Index = () => {
 
           {/* Geopolitical and Action cards - Better layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div className="lg:col-span-2 bg-white rounded-lg shadow border">
+            <div className="lg:col-span-2">
               <GeopoliticalInput 
                 gpr={data.gpr}
                 gpr_3y_values={data.gpr_3y_values}
@@ -206,8 +205,8 @@ const Index = () => {
               />
             </div>
             
-            <div className="bg-white rounded-lg shadow border">
-              <div className="h-full flex items-center justify-center p-6">
+            <Card className="shadow-lg border border-gray-200">
+              <CardContent className="h-full flex items-center justify-center p-6">
                 <div className="w-full space-y-4">
                   <Button 
                     onClick={calculateScores}
@@ -227,8 +226,8 @@ const Index = () => {
                     </Button>
                   )}
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
 
           {results && (
