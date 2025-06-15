@@ -137,7 +137,7 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gray-50 dark:bg-background transition-colors">
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-all duration-300">
         {/* Theme switch top right */}
         <div className="fixed right-4 top-4 z-50">
           <ThemeSwitcher />
@@ -158,10 +158,10 @@ const Index = () => {
           <div className="max-w-7xl mx-auto">
             {/* Simple header */}
             <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-4 animate-fade-in">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-50 dark:to-gray-300 bg-clip-text text-transparent mb-4 animate-fade-in">
                 Macroeconomic Analysis Dashboard
               </h1>
-              <p className="text-lg text-gray-600 dark:text-muted-foreground max-w-3xl mx-auto animate-fade-in">
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto animate-fade-in">
                 Advanced economic indicators analysis with real-time macro scoring and trading bias assessment
               </p>
             </div>
@@ -242,12 +242,12 @@ const Index = () => {
                   onValuesChange={(values) => updateData('gpr_3y_values', values)}
                 />
               </div>
-              <Card className="shadow-lg border border-gray-200 animate-scale-in">
+              <Card className="shadow-lg border border-gray-200 dark:border-gray-700 animate-scale-in bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
                 <CardContent className="h-full flex items-center justify-center p-6">
                   <div className="w-full space-y-4">
                     <Button 
                       onClick={calculateScores}
-                      className="w-full h-12 text-lg font-semibold"
+                      className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg"
                     >
                       Calculate Macro Score
                     </Button>
@@ -256,7 +256,7 @@ const Index = () => {
                       <Button 
                         onClick={() => setShowSaveDialog(true)}
                         variant="outline"
-                        className="w-full h-12 text-base font-semibold"
+                        className="w-full h-12 text-base font-semibold border-2 hover:bg-primary/5 transition-all duration-200"
                       >
                         <Save className="mr-2" size={18} />
                         Save with Custom Name
