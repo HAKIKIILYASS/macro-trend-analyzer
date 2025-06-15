@@ -52,7 +52,7 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
   const Content = (
     <SidebarContent className="bg-background border-r border-border">
       <SidebarGroup>
-        <SidebarGroupLabel className="text-foreground dark:text-gray-100 font-semibold">
+        <SidebarGroupLabel className="text-black dark:text-black font-semibold">
           Recent Scores
           <Button variant="ghost" size="icon" onClick={fetchScores} className="ml-1 hover:bg-accent" title="Refresh" disabled={loading}>
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
@@ -61,10 +61,10 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
         <SidebarGroupContent>
           <SidebarMenu>
             {loading && (
-              <p className="text-xs px-3 py-2 text-muted-foreground dark:text-gray-400">Loading scores...</p>
+              <p className="text-xs px-3 py-2 text-black dark:text-black">Loading scores...</p>
             )}
             {!loading && scores.length === 0 && (
-              <p className="text-xs px-3 py-2 text-muted-foreground dark:text-gray-400">No scores yet. Save some scores first!</p>
+              <p className="text-xs px-3 py-2 text-black dark:text-black">No scores yet. Save some scores first!</p>
             )}
             {!loading && scores.map((score, idx) => (
               <SidebarMenuItem key={score.id || idx} className="mb-2">
@@ -73,11 +73,11 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
                     onClick={(e) => handleLoadClick(score, e)}
                     className="cursor-pointer mb-3 pb-2 border-b border-border/50 hover:border-border transition-colors"
                   >
-                    <div className="text-sm font-semibold truncate mb-1 text-foreground dark:text-gray-100">{score.name}</div>
-                    <div className="text-xs text-muted-foreground dark:text-gray-300 mb-1">
+                    <div className="text-sm font-semibold truncate mb-1 text-black dark:text-black">{score.name}</div>
+                    <div className="text-xs text-black dark:text-black mb-1">
                       Score: {score.totalScore?.toFixed(2) || 'N/A'} | {score.bias || 'Unknown'}
                     </div>
-                    <div className="text-xs text-muted-foreground dark:text-gray-400">
+                    <div className="text-xs text-black dark:text-black">
                       {score.timestamp ? new Date(score.timestamp).toLocaleDateString() : ""}
                     </div>
                   </div>
@@ -106,8 +106,8 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
         </SidebarGroupContent>
       </SidebarGroup>
       <SidebarFooter className="border-t border-border bg-muted/30">
-        <div className="text-xs text-muted-foreground dark:text-gray-300 text-center p-3">
-          <div className="font-medium mb-2 text-foreground dark:text-gray-100">How to compare:</div>
+        <div className="text-xs text-black dark:text-black text-center p-3">
+          <div className="font-medium mb-2 text-black dark:text-black">How to compare:</div>
           <div className="space-y-1">
             <div>1. Click name to load scenario</div>
             <div>2. Use "Set as A" and "Set as B" buttons</div>
@@ -136,7 +136,7 @@ export default function RecentActivitySidebar({ onLoadScore, onCompare, open, se
         <div className="fixed inset-0 z-50 bg-black/50 dark:bg-black/70" onClick={() => setOpen(false)}>
           <div className="fixed left-0 top-0 h-full w-4/5 sm:w-80 bg-background border-r border-border shadow-2xl animate-slide-in-right" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center border-b border-border px-4 py-3 bg-muted/30">
-              <span className="font-bold text-lg text-foreground dark:text-gray-100">Recent Activity</span>
+              <span className="font-bold text-lg text-black dark:text-black">Recent Activity</span>
               <Button size="icon" variant="ghost" onClick={() => setOpen(false)} className="hover:bg-accent">
                 <X size={20} />
               </Button>
