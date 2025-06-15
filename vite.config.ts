@@ -10,12 +10,25 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
     watch: {
-      // Try to ignore node_modules and hidden files/folders
+      // Reduce file watching to prevent EMFILE errors
       ignored: [
         '**/node_modules/**',
         '**/.git/**',
-        '**/dist/**'
-      ]
+        '**/dist/**',
+        '**/build/**',
+        '**/.env*',
+        '**/coverage/**',
+        '**/.nyc_output/**',
+        '**/test-results/**',
+        '**/playwright-report/**',
+        '**/.cache/**',
+        '**/tmp/**',
+        '**/temp/**'
+      ],
+      // Use polling as fallback and reduce frequency
+      usePolling: process.env.NODE_ENV === 'development',
+      interval: 1000,
+      binaryInterval: 3000
     }
   },
   plugins: [
@@ -28,5 +41,15 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Optimize build to reduce file operations
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast']
+        }
+      }
+    }
+  }
 }));
-
