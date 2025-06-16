@@ -82,7 +82,7 @@ const EconomicMomentumInput: React.FC<EconomicMomentumInputProps> = ({
                   className="text-base border-orange-300 focus:border-orange-500 w-24"
                 />
                 <div className="text-xs text-gray-600">
-                  <div>+2: Exceptional (NFP >200K)</div>
+                  <div>+2: Exceptional (NFP {'>'}200K)</div>
                   <div>0: Average • -2: Poor</div>
                 </div>
               </div>
@@ -109,11 +109,11 @@ const EconomicMomentumInput: React.FC<EconomicMomentumInputProps> = ({
               </div>
             </div>
             <div className="text-xs text-gray-600 space-y-1">
-              <div>• >55: Strong expansion (+1.5)</div>
+              <div>• {'>'}55: Strong expansion (+1.5)</div>
               <div>• 52-55: Solid growth (+1.0)</div>
               <div>• 48-52: Neutral (0.0)</div>
               <div>• 45-48: Contraction (-1.0)</div>
-              <div>• <45: Deep trouble (-1.5)</div>
+              <div>• {'<'}45: Deep trouble (-1.5)</div>
             </div>
           </div>
 
