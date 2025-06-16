@@ -7,79 +7,102 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Info } from 'lucide-react';
 
 interface RiskSentimentInputProps {
-  credit_spread_1m_change: number;
-  vix: number;
-  onCreditChange: (value: number) => void;
+  vix_level: number;
+  gold_vs_stocks_weekly: number;
   onVixChange: (value: number) => void;
+  onGoldStocksChange: (value: number) => void;
 }
 
 const RiskSentimentInput: React.FC<RiskSentimentInputProps> = ({
-  credit_spread_1m_change,
-  vix,
-  onCreditChange,
+  vix_level,
+  gold_vs_stocks_weekly,
   onVixChange,
+  onGoldStocksChange,
 }) => {
   const getVixLevel = (vix: number) => {
-    if (vix >= 35) return { level: 'Extreme Fear', color: 'text-red-600' };
+    if (vix >= 30) return { level: 'Extreme Fear', color: 'text-red-600' };
     if (vix >= 25) return { level: 'High Fear', color: 'text-orange-600' };
-    if (vix >= 15) return { level: 'Normal', color: 'text-gray-600' };
-    if (vix >= 10) return { level: 'Low Fear', color: 'text-green-600' };
+    if (vix >= 20) return { level: 'Normal', color: 'text-gray-600' };
+    if (vix >= 15) return { level: 'Low Fear', color: 'text-green-600' };
     return { level: 'Extreme Greed', color: 'text-green-700' };
   };
 
-  const vixInfo = getVixLevel(vix);
+  const vixInfo = getVixLevel(vix_level);
 
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-orange-200 bg-gradient-to-br from-white to-orange-50">
-      <CardHeader className="bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-t-lg">
+    <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-red-200 bg-gradient-to-br from-white to-red-50">
+      <CardHeader className="bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-t-lg">
         <CardTitle className="flex items-center gap-3 text-lg font-semibold">
           <span className="text-xl">⚠️</span>
-          Risk Sentiment
+          Risk Sentiment (15%)
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <Info size={16} className="text-orange-200 hover:text-white transition-colors duration-200" />
+                <Info size={16} className="text-red-200 hover:text-white transition-colors duration-200" />
               </TooltipTrigger>
               <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-600">
-                <p>Measures market risk appetite through credit spreads and volatility. Higher values indicate risk aversion, while lower values suggest risk-on sentiment.</p>
+                <p>The Market's Mood Ring. VIX Level (60% weight) + Gold vs Stocks Safe Haven Flow (40% weight)</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div>
-            <Label htmlFor="credit-spread" className="text-base font-medium text-gray-700 mb-2 block transition-colors duration-200 hover:text-orange-600">Credit Spread 1M Change (%)</Label>
-            <Input
-              id="credit-spread"
-              type="number"
-              value={credit_spread_1m_change}
-              onChange={(e) => onCreditChange(parseFloat(e.target.value) || 0)}
-              step={0.01}
-              className="text-base border-orange-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
-            />
-            <div className="bg-gradient-to-r from-orange-50 to-red-50 p-3 rounded-lg mt-3 border-l-4 border-orange-400 shadow-sm">
-              <p className="text-sm text-gray-700">
-                <span className="text-red-600 font-medium">Positive = Widening spreads (risk off)</span>
-              </p>
+            <Label htmlFor="vix-level" className="text-base font-medium text-gray-700 mb-2 block">
+              VIX Level (60% weight)
+            </Label>
+            <div className="flex items-center gap-4 mb-2">
+              <Input
+                id="vix-level"
+                type="number"
+                value={vix_level}
+                onChange={(e) => onVixChange(parseFloat(e.target.value) || 0)}
+                min={10}
+                max={80}
+                step={0.1}
+                className="text-base border-red-300 focus:border-red-500 w-24"
+              />
+              <div className={`font-medium ${vixInfo.color}`}>
+                {vixInfo.level}
+              </div>
+            </div>
+            <div className="text-xs text-gray-600 space-y-1">
+              <div>• {'<'}15: Extreme greed (+1.5)</div>
+              <div>• 15-20: Low fear (+1.0)</div>
+              <div>• 20-25: Normal (0.0)</div>
+              <div>• 25-30: High fear (-1.0)</div>
+              <div>• {'>'}30: Extreme fear (-1.5)</div>
             </div>
           </div>
-          
+
           <div>
-            <Label htmlFor="vix" className="text-base font-medium text-gray-700 mb-2 block transition-colors duration-200 hover:text-orange-600">VIX Level</Label>
-            <Input
-              id="vix"
-              type="number"
-              value={vix}
-              onChange={(e) => onVixChange(parseFloat(e.target.value) || 0)}
-              step={0.1}
-              className="text-base border-orange-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
-            />
-            <div className="bg-gradient-to-r from-orange-50 to-red-50 p-3 rounded-lg mt-3 border-l-4 border-orange-400 shadow-sm">
-              <p className={`text-sm mt-1 font-medium ${vixInfo.color}`}>
-                {vixInfo.level}
-              </p>
+            <Label htmlFor="gold-stocks" className="text-base font-medium text-gray-700 mb-2 block">
+              Gold vs Stocks Weekly (40% weight)
+            </Label>
+            <div className="flex items-center gap-4 mb-2">
+              <Input
+                id="gold-stocks"
+                type="number"
+                value={gold_vs_stocks_weekly}
+                onChange={(e) => onGoldStocksChange(parseFloat(e.target.value) || 0)}
+                step={0.1}
+                className="text-base border-red-300 focus:border-red-500 w-24"
+              />
+              <span className="text-sm text-gray-600">% performance diff</span>
+            </div>
+            <div className="text-xs text-gray-600 space-y-1">
+              <div>• Gold outperforms: Risk-off (-1.0)</div>
+              <div>• Similar performance: Neutral (0.0)</div>
+              <div>• Stocks outperform: Risk-on (+1.0)</div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-red-50 to-orange-50 p-3 rounded-lg border-l-4 border-red-400">
+            <div className="text-xs font-medium text-gray-800 mb-1">📱 30-Second Daily Check:</div>
+            <div className="text-xs text-gray-600">
+              Yahoo Finance: VIX level + compare GLD vs SPY weekly performance
             </div>
           </div>
         </div>

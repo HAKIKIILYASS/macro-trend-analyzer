@@ -2,11 +2,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MacroData } from '@/pages/Index';
+import { CurrencyData } from '@/pages/Index';
 import { FileText, Download } from 'lucide-react';
 
 interface ExportDataProps {
-  data: MacroData;
+  data: CurrencyData;
   results: any;
 }
 
@@ -24,7 +24,7 @@ const ExportData: React.FC<ExportDataProps> = ({ data, results }) => {
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `macro_analysis_${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `currency_analysis_${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -34,16 +34,18 @@ const ExportData: React.FC<ExportDataProps> = ({ data, results }) => {
   const exportToCSV = () => {
     const csvData = [
       ['Indicator', 'Value', 'Score'],
-      ['Central Bank Hawkish Index', data.cb_hawkish_index, results?.scores?.cb_score || 'N/A'],
-      ['CPI', data.cpi, results?.scores?.inflation_score || 'N/A'],
-      ['CPI Target', data.cpi_target, ''],
-      ['3M CPI Change', data.cpi_3m_change, ''],
-      ['Current NFP', data.current_nfp, results?.scores?.labor_score || 'N/A'],
-      ['Credit Spread Change', data.credit_spread_1m_change, results?.scores?.risk_score || 'N/A'],
-      ['VIX', data.vix, ''],
-      ['PMI', data.pmi, results?.scores?.pmi_score || 'N/A'],
-      ['Current Account % GDP', data.ca_gdp, results?.scores?.ca_score || 'N/A'],
-      ['GPR Index', data.gpr, results?.scores?.geo_score || 'N/A'],
+      ['Rate Hike Probability (%)', data.rate_hike_probability, results?.scores?.rate_expectations || 'N/A'],
+      ['Path Adjustment', data.path_adjustment, ''],
+      ['US 2Y Yield (%)', data.us_2y_yield, results?.scores?.real_rate_edge || 'N/A'],
+      ['Target 2Y Yield (%)', data.target_2y_yield, ''],
+      ['US CPI (%)', data.us_cpi, ''],
+      ['Target CPI (%)', data.target_cpi, ''],
+      ['Employment Score', data.employment_score, results?.scores?.economic_momentum || 'N/A'],
+      ['PMI', data.pmi, ''],
+      ['Consumer Strength', data.consumer_strength, ''],
+      ['VIX Level', data.vix_level, results?.scores?.risk_sentiment || 'N/A'],
+      ['Gold vs Stocks Weekly (%)', data.gold_vs_stocks_weekly, ''],
+      ['Currency ETF Flows (M)', data.currency_etf_flows, results?.scores?.flow_dynamics || 'N/A'],
       ['', '', ''],
       ['Total Score', '', results?.total_score || 'N/A'],
       ['Trading Bias', '', results?.bias || 'N/A']
@@ -55,7 +57,7 @@ const ExportData: React.FC<ExportDataProps> = ({ data, results }) => {
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `macro_analysis_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `currency_analysis_${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -90,7 +92,7 @@ const ExportData: React.FC<ExportDataProps> = ({ data, results }) => {
           </Button>
         </div>
         <p className="text-sm text-gray-600 mt-3">
-          Export your analysis data and results for external use or record keeping.
+          Export your currency analysis data and results for external use or record keeping.
         </p>
       </CardContent>
     </Card>

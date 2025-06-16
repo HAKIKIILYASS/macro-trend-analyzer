@@ -3,19 +3,17 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Minus } from 'lucide-react';
-import { MacroData } from '@/pages/Index';
+import { CurrencyData } from '@/pages/Index';
 
 interface DashboardSummaryProps {
-  data: MacroData;
+  data: CurrencyData;
   results: {
     scores: {
-      cb_score: number;
-      inflation_score: number;
-      labor_score: number;
-      risk_score: number;
-      pmi_score: number;
-      ca_score: number;
-      geo_score: number;
+      rate_expectations: number;
+      real_rate_edge: number;
+      economic_momentum: number;
+      risk_sentiment: number;
+      flow_dynamics: number;
     };
     total_score: number;
     bias: string;
@@ -38,31 +36,31 @@ const DashboardSummary: React.FC<DashboardSummaryProps> = ({ data, results }) =>
 
   const keyMetrics = [
     { 
-      label: 'Central Bank Policy', 
-      value: data.cb_hawkish_index.toFixed(2), 
-      unit: '',
-      score: results?.scores.cb_score || 0,
-      description: 'Hawkish Index'
-    },
-    { 
-      label: 'Inflation Rate', 
-      value: data.cpi.toFixed(1), 
+      label: 'Rate Expectations', 
+      value: data.rate_hike_probability.toFixed(0), 
       unit: '%',
-      score: results?.scores.inflation_score || 0,
-      description: 'Current CPI'
+      score: results?.scores.rate_expectations || 0,
+      description: 'Hike Probability'
     },
     { 
-      label: 'Labor Market', 
-      value: data.current_nfp.toString(), 
-      unit: 'K',
-      score: results?.scores.labor_score || 0,
-      description: 'NFP (000s)'
+      label: 'Real Rate Edge', 
+      value: (data.us_2y_yield - data.us_cpi).toFixed(1), 
+      unit: '%',
+      score: results?.scores.real_rate_edge || 0,
+      description: 'US Real Rate'
     },
     { 
-      label: 'Market Risk', 
-      value: data.vix.toFixed(0), 
+      label: 'Economic Momentum', 
+      value: data.pmi.toString(), 
       unit: '',
-      score: results?.scores.risk_score || 0,
+      score: results?.scores.economic_momentum || 0,
+      description: 'PMI Level'
+    },
+    { 
+      label: 'Risk Sentiment', 
+      value: data.vix_level.toFixed(0), 
+      unit: '',
+      score: results?.scores.risk_sentiment || 0,
       description: 'VIX Level'
     }
   ];
@@ -105,8 +103,8 @@ const DashboardSummary: React.FC<DashboardSummaryProps> = ({ data, results }) =>
             <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Overall Market Bias</h3>
-                  <p className="text-sm text-gray-600">Based on comprehensive macro analysis</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Overall Currency Bias</h3>
+                  <p className="text-sm text-gray-600">Based on comprehensive currency analysis</p>
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold mb-1" style={{ color: results.biasColor }}>
@@ -129,20 +127,21 @@ const DashboardSummary: React.FC<DashboardSummaryProps> = ({ data, results }) =>
       <Card className="border border-gray-200 shadow-lg">
         <CardHeader className="bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-t-lg">
           <CardTitle className="text-lg font-semibold">
-            💡 Key Market Insights
+            💡 Key Currency Insights
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-3">
-              <h4 className="font-semibold text-gray-800">Economic Indicators</h4>
+              <h4 className="font-semibold text-gray-800">Rate Environment</h4>
               <div className="space-y-2">
                 <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                  <span className="text-sm">Inflation vs Target</span>
+                  <span className="text-sm">Rate Hike Probability</span>
                   <span className={`text-sm font-medium ${
-                    data.cpi > data.cpi_target ? 'text-red-600' : 'text-green-600'
+                    data.rate_hike_probability > 70 ? 'text-green-600' : 
+                    data.rate_hike_probability > 30 ? 'text-orange-500' : 'text-red-600'
                   }`}>
-                    {data.cpi > data.cpi_target ? 'Above' : 'Below'} ({data.cpi_target}%)
+                    {data.rate_hike_probability}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
@@ -162,17 +161,17 @@ const DashboardSummary: React.FC<DashboardSummaryProps> = ({ data, results }) =>
                 <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
                   <span className="text-sm">Market Volatility</span>
                   <span className={`text-sm font-medium ${
-                    data.vix > 25 ? 'text-red-600' : data.vix > 15 ? 'text-orange-500' : 'text-green-600'
+                    data.vix_level > 25 ? 'text-red-600' : data.vix_level > 15 ? 'text-orange-500' : 'text-green-600'
                   }`}>
-                    {data.vix > 25 ? 'High' : data.vix > 15 ? 'Moderate' : 'Low'} ({data.vix})
+                    {data.vix_level > 25 ? 'High' : data.vix_level > 15 ? 'Moderate' : 'Low'} ({data.vix_level})
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                  <span className="text-sm">Current Account</span>
+                  <span className="text-sm">Employment Score</span>
                   <span className={`text-sm font-medium ${
-                    data.ca_gdp < 0 ? 'text-red-600' : 'text-green-600'
+                    data.employment_score > 0 ? 'text-green-600' : data.employment_score < 0 ? 'text-red-600' : 'text-gray-600'
                   }`}>
-                    {data.ca_gdp < 0 ? 'Deficit' : 'Surplus'} ({data.ca_gdp}%)
+                    {data.employment_score > 0 ? 'Strong' : data.employment_score < 0 ? 'Weak' : 'Neutral'} ({data.employment_score})
                   </span>
                 </div>
               </div>
