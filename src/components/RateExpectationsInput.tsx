@@ -22,7 +22,7 @@ const RateExpectationsInput: React.FC<RateExpectationsInputProps> = ({
   onPathChange
 }) => {
   const getProbabilityScore = () => {
-    if (probability >= 70) return { score: '+2.0', color: 'text-green-600', label: 'Hike Expected' };
+    if (probability > 70) return { score: '+2.0', color: 'text-green-600', label: 'Rate Hike Expected' };
     if (probability >= 50) return { score: '+1.0', color: 'text-green-500', label: 'Likely Hike' };
     if (probability >= 30) return { score: '0.0', color: 'text-gray-600', label: 'Neutral' };
     if (probability >= 10) return { score: '-1.0', color: 'text-orange-500', label: 'Likely Cut' };
@@ -91,6 +91,13 @@ const RateExpectationsInput: React.FC<RateExpectationsInputProps> = ({
                 </div>
               </div>
             </div>
+            <div className="text-xs text-gray-600 space-y-1 mt-2">
+              <div>• {'>'}70%: Rate Hike Expected (+2.0)</div>
+              <div>• 50-70%: Likely Hike (+1.0)</div>
+              <div>• 30-50%: Neutral (0.0)</div>
+              <div>• 10-30%: Likely Cut (-1.0)</div>
+              <div>• {'<'}10%: Cut Expected (-2.0)</div>
+            </div>
           </div>
 
           <div>
@@ -125,11 +132,12 @@ const RateExpectationsInput: React.FC<RateExpectationsInputProps> = ({
           </div>
 
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-lg border-l-4 border-green-400">
-            <div className="text-xs font-medium text-gray-800 mb-2">📱 Mobile-First Data Sources:</div>
+            <div className="text-xs font-medium text-gray-800 mb-2">📱 5-Minute Weekly Update:</div>
             <div className="text-xs text-gray-600 space-y-1">
-              <div>• CME FedWatch (bookmark on phone)</div>
-              <div>• ECB Watch Tool (Reuters)</div>
-              <div>• Bank Rate Monitor (TradingEconomics app)</div>
+              <div>• CME FedWatch (USD) - 1 minute</div>
+              <div>• ECB policy tracker (EUR) - 1 minute</div>
+              <div>• RBA/BoE headlines - 2 minutes</div>
+              <div>• Update probability scores - 1 minute</div>
             </div>
           </div>
         </div>
