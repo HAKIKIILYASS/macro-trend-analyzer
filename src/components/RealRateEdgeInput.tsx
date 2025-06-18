@@ -9,35 +9,35 @@ import { Info, ExternalLink } from 'lucide-react';
 interface RealRateEdgeInputProps {
   us_2y_yield: number;
   target_2y_yield: number;
-  us_cpi: number;
-  target_cpi: number;
+  us_inflation_expectation: number;
+  target_inflation_expectation: number;
   onUsYieldChange: (value: number) => void;
   onTargetYieldChange: (value: number) => void;
-  onUsCpiChange: (value: number) => void;
-  onTargetCpiChange: (value: number) => void;
+  onUsInflationChange: (value: number) => void;
+  onTargetInflationChange: (value: number) => void;
 }
 
 const RealRateEdgeInput: React.FC<RealRateEdgeInputProps> = ({
   us_2y_yield,
   target_2y_yield,
-  us_cpi,
-  target_cpi,
+  us_inflation_expectation,
+  target_inflation_expectation,
   onUsYieldChange,
   onTargetYieldChange,
-  onUsCpiChange,
-  onTargetCpiChange
+  onUsInflationChange,
+  onTargetInflationChange
 }) => {
-  const usRealRate = us_2y_yield - us_cpi;
-  const targetRealRate = target_2y_yield - target_cpi;
+  const usRealRate = us_2y_yield - us_inflation_expectation;
+  const targetRealRate = target_2y_yield - target_inflation_expectation;
   const differential = usRealRate - targetRealRate;
-  const score = Math.max(-3.0, Math.min(3.0, differential * 1.5));
+  const score = Math.max(-3.0, Math.min(3.0, differential * 2.0));
 
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-blue-200 bg-gradient-to-br from-white to-blue-50">
       <CardHeader className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-t-lg">
         <CardTitle className="flex items-center gap-3 text-lg font-semibold">
           <span className="text-xl">🏛️</span>
-          Real Rate Edge (25%)
+          Real Interest Edge (25%)
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
@@ -80,14 +80,14 @@ const RealRateEdgeInput: React.FC<RealRateEdgeInputProps> = ({
               />
             </div>
             <div>
-              <Label htmlFor="us-cpi" className="text-sm font-medium text-gray-700">
-                US CPI (%)
+              <Label htmlFor="us-inflation" className="text-sm font-medium text-gray-700">
+                US Inflation Expectation (%)
               </Label>
               <Input
-                id="us-cpi"
+                id="us-inflation"
                 type="number"
-                value={us_cpi}
-                onChange={(e) => onUsCpiChange(parseFloat(e.target.value) || 0)}
+                value={us_inflation_expectation}
+                onChange={(e) => onUsInflationChange(parseFloat(e.target.value) || 0)}
                 min={-2}
                 max={15}
                 step={0.1}
@@ -120,14 +120,14 @@ const RealRateEdgeInput: React.FC<RealRateEdgeInputProps> = ({
               />
             </div>
             <div>
-              <Label htmlFor="target-cpi" className="text-sm font-medium text-gray-700">
-                Target CPI (%)
+              <Label htmlFor="target-inflation" className="text-sm font-medium text-gray-700">
+                Target Inflation Expectation (%)
               </Label>
               <Input
-                id="target-cpi"
+                id="target-inflation"
                 type="number"
-                value={target_cpi}
-                onChange={(e) => onTargetCpiChange(parseFloat(e.target.value) || 0)}
+                value={target_inflation_expectation}
+                onChange={(e) => onTargetInflationChange(parseFloat(e.target.value) || 0)}
                 min={-2}
                 max={15}
                 step={0.1}
@@ -151,7 +151,7 @@ const RealRateEdgeInput: React.FC<RealRateEdgeInputProps> = ({
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Score (×1.5 multiplier):</span>
+            <span className="text-sm text-gray-600">Score (×2.0 multiplier):</span>
             <span className={`text-lg font-bold ${score > 0 ? 'text-green-600' : 'text-red-600'}`}>
               {score > 0 ? '+' : ''}{score.toFixed(2)}
             </span>
@@ -161,7 +161,7 @@ const RealRateEdgeInput: React.FC<RealRateEdgeInputProps> = ({
         <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border-l-4 border-blue-400">
           <div className="text-xs font-medium text-gray-800 mb-1">💡 Pro Tip:</div>
           <div className="text-xs text-gray-600">
-            CPI release days: Impact is multiplied by 1.5x as markets overreact to surprises
+            CPI release days: Impact is multiplied by 1.8x as markets overreact to surprises
           </div>
         </div>
       </CardContent>

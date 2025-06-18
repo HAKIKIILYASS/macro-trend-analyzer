@@ -8,28 +8,24 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Info } from 'lucide-react';
 
 interface EconomicMomentumInputProps {
-  employment_score: number;
+  employment_health: number;
   pmi: number;
-  consumer_strength: number;
   onEmploymentChange: (value: number) => void;
   onPmiChange: (value: number) => void;
-  onConsumerChange: (value: number) => void;
 }
 
 const EconomicMomentumInput: React.FC<EconomicMomentumInputProps> = ({
-  employment_score,
+  employment_health,
   pmi,
-  consumer_strength,
   onEmploymentChange,
-  onPmiChange,
-  onConsumerChange
+  onPmiChange
 }) => {
   const getPmiScore = () => {
-    if (pmi > 55) return { score: 1.5, label: 'Strong expansion', color: 'text-green-600' };
-    if (pmi >= 52) return { score: 1.0, label: 'Solid growth', color: 'text-green-500' };
-    if (pmi >= 48) return { score: 0.0, label: 'Neutral', color: 'text-gray-600' };
-    if (pmi >= 45) return { score: -1.0, label: 'Contraction', color: 'text-orange-500' };
-    return { score: -1.5, label: 'Deep trouble', color: 'text-red-600' };
+    if (pmi > 53) return { score: 1.0, label: 'Strong expansion', color: 'text-green-600' };
+    if (pmi >= 50) return { score: 0.5, label: 'Mild growth', color: 'text-green-500' };
+    if (pmi >= 47) return { score: 0.0, label: 'Stagnant', color: 'text-gray-600' };
+    if (pmi >= 45) return { score: -0.5, label: 'Mild contraction', color: 'text-orange-500' };
+    return { score: -1.0, label: 'Deep contraction', color: 'text-red-600' };
   };
 
   const pmiScore = getPmiScore();
@@ -39,14 +35,14 @@ const EconomicMomentumInput: React.FC<EconomicMomentumInputProps> = ({
       <CardHeader className="bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-t-lg">
         <CardTitle className="flex items-center gap-3 text-lg font-semibold">
           <span className="text-xl">📈</span>
-          Economic Momentum (22%)
+          Growth Momentum (25%)
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
                 <Info size={16} className="text-orange-200 hover:text-white transition-colors duration-200" />
               </TooltipTrigger>
               <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-600">
-                <p>The Growth Story. Triple-component system: Employment (50%), Manufacturing PMI (30%), Consumer Strength (20%)</p>
+                <p>The Economic Engine. Employment Health (50%) + Manufacturing PMI (50%)</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -57,16 +53,16 @@ const EconomicMomentumInput: React.FC<EconomicMomentumInputProps> = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <Label htmlFor="employment" className="text-base font-medium text-gray-700">
-                Employment Strength (50% weight)
+                Employment Health (50% weight)
               </Label>
-              <span className="text-sm text-gray-500">Score: -2 to +2</span>
+              <span className="text-sm text-gray-500">Score: -1 to +1</span>
             </div>
             <div className="mt-3">
               <Slider
-                value={[employment_score]}
+                value={[employment_health]}
                 onValueChange={(values) => onEmploymentChange(values[0])}
-                max={2}
-                min={-2}
+                max={1}
+                min={-1}
                 step={0.1}
                 className="mb-4"
               />
@@ -74,16 +70,16 @@ const EconomicMomentumInput: React.FC<EconomicMomentumInputProps> = ({
                 <Input
                   id="employment"
                   type="number"
-                  value={employment_score}
+                  value={employment_health}
                   onChange={(e) => onEmploymentChange(parseFloat(e.target.value) || 0)}
-                  min={-2}
-                  max={2}
+                  min={-1}
+                  max={1}
                   step={0.1}
                   className="text-base border-orange-300 focus:border-orange-500 w-24"
                 />
                 <div className="text-xs text-gray-600">
-                  <div>+2: Exceptional (NFP {'>'}200K)</div>
-                  <div>0: Average • -2: Poor</div>
+                  <div>+1.0: Strong (NFP {'>'}200K)</div>
+                  <div>0.0: Normal • -1.0: Weak</div>
                 </div>
               </div>
             </div>
@@ -91,7 +87,7 @@ const EconomicMomentumInput: React.FC<EconomicMomentumInputProps> = ({
 
           <div>
             <Label htmlFor="pmi" className="text-base font-medium text-gray-700 mb-2 block">
-              Manufacturing PMI (30% weight)
+              Manufacturing PMI (50% weight)
             </Label>
             <div className="flex items-center gap-4 mb-2">
               <Input
@@ -109,46 +105,11 @@ const EconomicMomentumInput: React.FC<EconomicMomentumInputProps> = ({
               </div>
             </div>
             <div className="text-xs text-gray-600 space-y-1">
-              <div>• {'>'}55: Strong expansion (+1.5)</div>
-              <div>• 52-55: Solid growth (+1.0)</div>
-              <div>• 48-52: Neutral (0.0)</div>
-              <div>• 45-48: Contraction (-1.0)</div>
-              <div>• {'<'}45: Deep trouble (-1.5)</div>
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <Label htmlFor="consumer" className="text-base font-medium text-gray-700">
-                Consumer Strength (20% weight)
-              </Label>
-              <span className="text-sm text-gray-500">Score: -2 to +2</span>
-            </div>
-            <div className="mt-3">
-              <Slider
-                value={[consumer_strength]}
-                onValueChange={(values) => onConsumerChange(values[0])}
-                max={2}
-                min={-2}
-                step={0.1}
-                className="mb-4"
-              />
-              <div className="flex items-center gap-4">
-                <Input
-                  id="consumer"
-                  type="number"
-                  value={consumer_strength}
-                  onChange={(e) => onConsumerChange(parseFloat(e.target.value) || 0)}
-                  min={-2}
-                  max={2}
-                  step={0.1}
-                  className="text-base border-orange-300 focus:border-orange-500 w-24"
-                />
-                <div className="text-xs text-gray-600">
-                  <div>Retail Sales + Consumer Confidence</div>
-                  <div>+ Credit Growth trends</div>
-                </div>
-              </div>
+              <div>• {'>'}53: Strong expansion (+1.0)</div>
+              <div>• 50-53: Mild growth (+0.5)</div>
+              <div>• 47-50: Stagnant (0.0)</div>
+              <div>• 45-47: Mild contraction (-0.5)</div>
+              <div>• {'<'}45: Deep contraction (-1.0)</div>
             </div>
           </div>
 
