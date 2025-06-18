@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Label } from '@/components/ui/label';
 import { Info, ExternalLink } from 'lucide-react';
 
 interface FlowDynamicsInputProps {
@@ -66,7 +67,7 @@ const FlowDynamicsInput: React.FC<FlowDynamicsInputProps> = ({
                 <SelectItem value="major_inflows">
                   <div className="flex items-center gap-2">
                     <span className="text-green-600">🟢</span>
-                    Major Inflows (>$500M monthly)
+                    Major Inflows ({'>'}$500M monthly)
                   </div>
                 </SelectItem>
                 <SelectItem value="normal">
@@ -78,7 +79,7 @@ const FlowDynamicsInput: React.FC<FlowDynamicsInputProps> = ({
                 <SelectItem value="major_outflows">
                   <div className="flex items-center gap-2">
                     <span className="text-red-600">🔴</span>
-                    Major Outflows (>$500M monthly)
+                    Major Outflows ({'>'}$500M monthly)
                   </div>
                 </SelectItem>
               </SelectContent>
