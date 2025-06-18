@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -31,49 +30,49 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 export interface CurrencyData {
   // Regime Detection
   vix: number;
-  usd_jpy_trend: 'declining' | 'rising' | 'neutral';
+  gold_vs_stocks_monthly: number; // Monthly performance difference %
+  sp500_new_highs: boolean;
   is_cb_week: boolean;
   
-  // Rate Expectations (28%)
+  // Rate Policy (30%)
   rate_hike_probability: number; // 0-100%
-  path_adjustment: 'hawkish' | 'expected' | 'dovish';
+  rate_cut_probability: number; // 0-100%
+  guidance_shift: 'hawkish' | 'neutral' | 'dovish';
   
-  // Real Rate Edge (25%)
+  // Growth Momentum (25%)
+  employment_health: number; // Strong(+1.0), Normal(0.0), Weak(-1.0)
+  pmi: number;
+  
+  // Real Interest Edge (25%)
   us_2y_yield: number;
   target_2y_yield: number;
-  us_cpi: number;
-  target_cpi: number;
+  us_inflation_expectation: number;
+  target_inflation_expectation: number;
   
-  // Economic Momentum (22%)
-  employment_score: number; // -2 to +2
-  pmi: number;
-  consumer_strength: number; // -2 to +2
+  // Risk Appetite (15%)
+  gold_sp500_ratio_trend: 'rising' | 'stable' | 'falling';
   
-  // Risk Sentiment (15%)
-  vix_level: number;
-  gold_vs_stocks_weekly: number; // % performance diff
-  
-  // Flow Dynamics (10%)
-  currency_etf_flows: number; // in millions
+  // Money Flow (5%)
+  etf_flows: 'major_inflows' | 'normal' | 'major_outflows';
 }
 
 const Index = () => {
   const [data, setData] = useState<CurrencyData>({
     vix: 20,
-    usd_jpy_trend: 'neutral',
+    gold_vs_stocks_monthly: 0,
+    sp500_new_highs: false,
     is_cb_week: false,
     rate_hike_probability: 50,
-    path_adjustment: 'expected',
+    rate_cut_probability: 25,
+    guidance_shift: 'neutral',
+    employment_health: 0,
+    pmi: 50,
     us_2y_yield: 4.5,
     target_2y_yield: 3.5,
-    us_cpi: 3.2,
-    target_cpi: 2.8,
-    employment_score: 0,
-    pmi: 50,
-    consumer_strength: 0,
-    vix_level: 20,
-    gold_vs_stocks_weekly: 0,
-    currency_etf_flows: 0
+    us_inflation_expectation: 3.2,
+    target_inflation_expectation: 2.8,
+    gold_sp500_ratio_trend: 'stable',
+    etf_flows: 'normal'
   });
 
   const [results, setResults] = useState(null);
@@ -214,10 +213,10 @@ const Index = () => {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-50 dark:to-gray-300 bg-clip-text text-transparent mb-4 animate-fade-in">
-                Professional Currency Analysis Dashboard
+                Perfect Retail Forex Macro Scoring Model
               </h1>
               <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto animate-fade-in">
-                Maximum Edge with Minimum Effort - 20-minute weekly maintenance for professional-grade signals
+                Professional Edge • Retail Simplicity • Zero Mistakes - 25 minutes weekly maintenance
               </p>
             </div>
 
@@ -237,44 +236,46 @@ const Index = () => {
             <div className="mb-8 animate-fade-in">
               <RegimeDetectionInput 
                 vix={data.vix}
-                usd_jpy_trend={data.usd_jpy_trend}
+                gold_vs_stocks_monthly={data.gold_vs_stocks_monthly}
+                sp500_new_highs={data.sp500_new_highs}
                 is_cb_week={data.is_cb_week}
                 onVixChange={(value) => updateData('vix', value)}
-                onTrendChange={(value) => updateData('usd_jpy_trend', value)}
+                onGoldStocksChange={(value) => updateData('gold_vs_stocks_monthly', value)}
+                onSp500HighsChange={(value) => updateData('sp500_new_highs', value)}
                 onCbWeekChange={(value) => updateData('is_cb_week', value)}
               />
             </div>
 
-            {/* Input cards - New 5-factor model */}
+            {/* Input cards - Updated 5-factor model */}
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
               <div className="h-full animate-fade-in">
                 <RateExpectationsInput 
-                  probability={data.rate_hike_probability}
-                  path_adjustment={data.path_adjustment}
-                  onProbabilityChange={(value) => updateData('rate_hike_probability', value)}
-                  onPathChange={(value) => updateData('path_adjustment', value)}
+                  rate_hike_probability={data.rate_hike_probability}
+                  rate_cut_probability={data.rate_cut_probability}
+                  guidance_shift={data.guidance_shift}
+                  onHikeProbabilityChange={(value) => updateData('rate_hike_probability', value)}
+                  onCutProbabilityChange={(value) => updateData('rate_cut_probability', value)}
+                  onGuidanceChange={(value) => updateData('guidance_shift', value)}
                 />
               </div>
               <div className="h-full animate-fade-in">
                 <RealRateEdgeInput 
                   us_2y_yield={data.us_2y_yield}
                   target_2y_yield={data.target_2y_yield}
-                  us_cpi={data.us_cpi}
-                  target_cpi={data.target_cpi}
+                  us_inflation_expectation={data.us_inflation_expectation}
+                  target_inflation_expectation={data.target_inflation_expectation}
                   onUsYieldChange={(value) => updateData('us_2y_yield', value)}
                   onTargetYieldChange={(value) => updateData('target_2y_yield', value)}
-                  onUsCpiChange={(value) => updateData('us_cpi', value)}
-                  onTargetCpiChange={(value) => updateData('target_cpi', value)}
+                  onUsInflationChange={(value) => updateData('us_inflation_expectation', value)}
+                  onTargetInflationChange={(value) => updateData('target_inflation_expectation', value)}
                 />
               </div>
               <div className="h-full animate-fade-in">
                 <EconomicMomentumInput 
-                  employment_score={data.employment_score}
+                  employment_health={data.employment_health}
                   pmi={data.pmi}
-                  consumer_strength={data.consumer_strength}
-                  onEmploymentChange={(value) => updateData('employment_score', value)}
+                  onEmploymentChange={(value) => updateData('employment_health', value)}
                   onPmiChange={(value) => updateData('pmi', value)}
-                  onConsumerChange={(value) => updateData('consumer_strength', value)}
                 />
               </div>
             </div>
@@ -282,16 +283,16 @@ const Index = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               <div className="animate-scale-in">
                 <RiskSentimentInput 
-                  vix_level={data.vix_level}
-                  gold_vs_stocks_weekly={data.gold_vs_stocks_weekly}
-                  onVixChange={(value) => updateData('vix_level', value)}
-                  onGoldStocksChange={(value) => updateData('gold_vs_stocks_weekly', value)}
+                  vix={data.vix}
+                  gold_sp500_ratio_trend={data.gold_sp500_ratio_trend}
+                  onVixChange={(value) => updateData('vix', value)}
+                  onGoldRatioChange={(value) => updateData('gold_sp500_ratio_trend', value)}
                 />
               </div>
               <div className="animate-scale-in">
                 <FlowDynamicsInput 
-                  currency_etf_flows={data.currency_etf_flows}
-                  onFlowsChange={(value) => updateData('currency_etf_flows', value)}
+                  etf_flows={data.etf_flows}
+                  onFlowsChange={(value) => updateData('etf_flows', value)}
                 />
               </div>
               <Card className="shadow-lg border border-gray-200 dark:border-gray-700 animate-scale-in bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
