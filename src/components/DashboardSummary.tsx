@@ -9,11 +9,11 @@ interface DashboardSummaryProps {
   data: CurrencyData;
   results: {
     scores: {
-      rate_expectations: number;
-      real_rate_edge: number;
-      economic_momentum: number;
-      risk_sentiment: number;
-      flow_dynamics: number;
+      rate_policy: number;
+      growth_momentum: number;
+      real_interest_edge: number;
+      risk_appetite: number;
+      money_flow: number;
     };
     total_score: number;
     bias: string;
@@ -36,31 +36,31 @@ const DashboardSummary: React.FC<DashboardSummaryProps> = ({ data, results }) =>
 
   const keyMetrics = [
     { 
-      label: 'Rate Expectations', 
+      label: 'Rate Policy', 
       value: data.rate_hike_probability.toFixed(0), 
       unit: '%',
-      score: results?.scores.rate_expectations || 0,
+      score: results?.scores.rate_policy || 0,
       description: 'Hike Probability'
     },
     { 
       label: 'Real Rate Edge', 
-      value: (data.us_2y_yield - data.us_cpi).toFixed(1), 
+      value: (data.us_2y_yield - data.us_inflation_expectation).toFixed(1), 
       unit: '%',
-      score: results?.scores.real_rate_edge || 0,
+      score: results?.scores.real_interest_edge || 0,
       description: 'US Real Rate'
     },
     { 
       label: 'Economic Momentum', 
       value: data.pmi.toString(), 
       unit: '',
-      score: results?.scores.economic_momentum || 0,
+      score: results?.scores.growth_momentum || 0,
       description: 'PMI Level'
     },
     { 
       label: 'Risk Sentiment', 
-      value: data.vix_level.toFixed(0), 
+      value: data.vix.toFixed(0), 
       unit: '',
-      score: results?.scores.risk_sentiment || 0,
+      score: results?.scores.risk_appetite || 0,
       description: 'VIX Level'
     }
   ];
@@ -161,17 +161,17 @@ const DashboardSummary: React.FC<DashboardSummaryProps> = ({ data, results }) =>
                 <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
                   <span className="text-sm">Market Volatility</span>
                   <span className={`text-sm font-medium ${
-                    data.vix_level > 25 ? 'text-red-600' : data.vix_level > 15 ? 'text-orange-500' : 'text-green-600'
+                    data.vix > 25 ? 'text-red-600' : data.vix > 15 ? 'text-orange-500' : 'text-green-600'
                   }`}>
-                    {data.vix_level > 25 ? 'High' : data.vix_level > 15 ? 'Moderate' : 'Low'} ({data.vix_level})
+                    {data.vix > 25 ? 'High' : data.vix > 15 ? 'Moderate' : 'Low'} ({data.vix})
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                  <span className="text-sm">Employment Score</span>
+                  <span className="text-sm">Employment Health</span>
                   <span className={`text-sm font-medium ${
-                    data.employment_score > 0 ? 'text-green-600' : data.employment_score < 0 ? 'text-red-600' : 'text-gray-600'
+                    data.employment_health > 0 ? 'text-green-600' : data.employment_health < 0 ? 'text-red-600' : 'text-gray-600'
                   }`}>
-                    {data.employment_score > 0 ? 'Strong' : data.employment_score < 0 ? 'Weak' : 'Neutral'} ({data.employment_score})
+                    {data.employment_health > 0 ? 'Strong' : data.employment_health < 0 ? 'Weak' : 'Neutral'} ({data.employment_health})
                   </span>
                 </div>
               </div>

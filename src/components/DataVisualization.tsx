@@ -21,14 +21,13 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ data }) => {
   ];
 
   const economicData = [
-    { indicator: 'Employment', score: data.employment_score },
+    { indicator: 'Employment', score: data.employment_health },
     { indicator: 'PMI', score: (data.pmi - 50) / 10 }, // Normalize PMI to -2 to +2 scale
-    { indicator: 'Consumer', score: data.consumer_strength },
   ];
 
   const riskData = [
-    { metric: 'VIX', level: data.vix_level },
-    { metric: 'Gold vs Stocks', level: data.gold_vs_stocks_weekly },
+    { metric: 'VIX', level: data.vix },
+    { metric: 'Gold vs Stocks', level: data.gold_vs_stocks_monthly },
   ];
 
   return (
