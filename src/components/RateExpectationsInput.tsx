@@ -11,7 +11,7 @@ import { Info, ExternalLink } from 'lucide-react';
 interface RateExpectationsInputProps {
   rate_hike_probability: number;
   rate_cut_probability: number;
-  guidance_shift: 'hawkish' | 'neutral' | 'dovish';
+  guidance_shift: 'hawkish'  | 'neutral' | 'dovish';
   onHikeProbabilityChange: (value: number) => void;
   onCutProbabilityChange: (value: number) => void;
   onGuidanceChange: (value: 'hawkish' | 'neutral' | 'dovish') => void;
@@ -26,12 +26,13 @@ const RateExpectationsInput: React.FC<RateExpectationsInputProps> = ({
   onGuidanceChange
 }) => {
   const getProbabilityScore = () => {
-    if (rate_hike_probability > 75) return { score: '+2.0', color: 'text-green-600', label: 'Rate Hike Expected' };
-    if (rate_hike_probability >= 50) return { score: '+1.5', color: 'text-green-500', label: 'Likely Hike 50-75%' };
-    if (rate_hike_probability >= 25) return { score: '+1.0', color: 'text-green-400', label: 'Possible Hike 25-50%' };
-    if (rate_cut_probability >= 25 && rate_cut_probability < 50) return { score: '-1.0', color: 'text-orange-500', label: 'Possible Cut 25-50%' };
-    if (rate_cut_probability >= 50 && rate_cut_probability < 75) return { score: '-1.5', color: 'text-red-500', label: 'Likely Cut 50-75%' };
-    if (rate_cut_probability > 75) return { score: '-2.0', color: 'text-red-600', label: 'Cut Expected' };
+    // Your exact probability thresholds
+    if (rate_hike_probability > 75) return { score: '+2.0', color: 'text-green-600', label: 'Rate Hike Expected (>75%)' };
+    if (rate_hike_probability >= 50) return { score: '+1.5', color: 'text-green-500', label: 'Likely Hike (50-75%)' };
+    if (rate_hike_probability >= 25) return { score: '+1.0', color: 'text-green-400', label: 'Possible Hike (25-50%)' };
+    if (rate_cut_probability >= 25 && rate_cut_probability < 50) return { score: '-1.0', color: 'text-orange-500', label: 'Possible Cut (25-50%)' };
+    if (rate_cut_probability >= 50 && rate_cut_probability < 75) return { score: '-1.5', color: 'text-red-500', label: 'Likely Cut (50-75%)' };
+    if (rate_cut_probability > 75) return { score: '-2.0', color: 'text-red-600', label: 'Cut Expected (>75%)' };
     return { score: '0.0', color: 'text-gray-600', label: 'No Change Expected' };
   };
 
@@ -42,14 +43,14 @@ const RateExpectationsInput: React.FC<RateExpectationsInputProps> = ({
       <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
         <CardTitle className="flex items-center gap-3 text-lg font-semibold">
           <span className="text-xl">🏦</span>
-          Rate Policy (30%)
+          Rate Policy (The Currency King-Maker)
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
                 <Info size={16} className="text-green-200 hover:text-white transition-colors duration-200" />
               </TooltipTrigger>
               <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-600">
-                <p>The Currency King-Maker. Next Meeting Probability (70%) + Forward Guidance Shift (30%)</p>
+                <p>Most important factor! Next Meeting Probability (70%) + Forward Guidance Shift (30%)</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -57,19 +58,26 @@ const RateExpectationsInput: React.FC<RateExpectationsInputProps> = ({
       </CardHeader>
       <CardContent className="p-6">
         <div className="space-y-6">
+          <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400 mb-4">
+            <div className="text-sm font-medium text-gray-800 mb-1">🎯 Simple Question:</div>
+            <div className="text-sm text-gray-700">Which country's central bank will raise rates next?</div>
+          </div>
+
           <div>
             <div className="flex items-center justify-between mb-2">
               <Label htmlFor="rate-hike-probability" className="text-base font-medium text-gray-700">
-                Rate Hike Probability (70% weight)
+                Next Meeting: Rate Hike Probability (70% weight)
               </Label>
-              <a 
-                href="https://www.cmegroup.com/trading/interest-rates/countdown-to-fomc.html" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
-              >
-                CME FedWatch <ExternalLink className="w-3 h-3" />
-              </a>
+              <div className="flex gap-2">
+                <a 
+                  href="https://www.cmegroup.com/trading/interest-rates/countdown-to-fomc.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                >
+                  USA: CME FedWatch <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
             </div>
             <div className="mt-3">
               <Slider
@@ -98,7 +106,7 @@ const RateExpectationsInput: React.FC<RateExpectationsInputProps> = ({
 
           <div>
             <Label htmlFor="rate-cut-probability" className="text-base font-medium text-gray-700 mb-2 block">
-              Rate Cut Probability
+              Rate Cut Probability (if applicable)
             </Label>
             <div className="flex items-center gap-4">
               <Input
@@ -115,16 +123,17 @@ const RateExpectationsInput: React.FC<RateExpectationsInputProps> = ({
             </div>
           </div>
 
-          <div className="p-3 bg-gray-50 rounded-lg border">
-            <div className="text-sm font-medium text-gray-700 mb-1">Current Score:</div>
-            <div className={`text-lg font-bold ${probScore.color}`}>
-              {probScore.score} - {probScore.label}
+          <div className="p-4 bg-gray-50 rounded-lg border">
+            <div className="text-sm font-medium text-gray-700 mb-2">📊 Your Current Score:</div>
+            <div className={`text-xl font-bold ${probScore.color} mb-1`}>
+              {probScore.score}
             </div>
+            <div className="text-sm text-gray-600">{probScore.label}</div>
           </div>
 
           <div>
             <Label htmlFor="guidance-shift" className="text-base font-medium text-gray-700 mb-2 block">
-              Forward Guidance Shift (30% weight)
+              Forward Guidance: Are They Talking Tougher or Softer? (30% weight)
             </Label>
             <Select value={guidance_shift} onValueChange={onGuidanceChange}>
               <SelectTrigger className="border-green-300 focus:border-green-500">
@@ -134,44 +143,40 @@ const RateExpectationsInput: React.FC<RateExpectationsInputProps> = ({
                 <SelectItem value="hawkish">
                   <div className="flex items-center gap-2">
                     <span className="text-green-600">📈</span>
-                    More Hawkish Signals (+0.5)
+                    More Hawkish (+0.5) - "We may need to do more"
                   </div>
                 </SelectItem>
                 <SelectItem value="neutral">
                   <div className="flex items-center gap-2">
                     <span className="text-gray-600">➖</span>
-                    Same Tone (0.0)
+                    Same Tone (0.0) - Nothing new
                   </div>
                 </SelectItem>
                 <SelectItem value="dovish">
                   <div className="flex items-center gap-2">
                     <span className="text-red-600">📉</span>
-                    More Dovish Signals (-0.5)
+                    More Dovish (-0.5) - "We're close to done"
                   </div>
                 </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div className="text-xs text-gray-600 space-y-1">
-            <div><strong>Probability Scoring:</strong></div>
-            <div>• Rate Hike {'>'}75%: +2.0</div>
-            <div>• Rate Hike 50-75%: +1.5</div>
-            <div>• Rate Hike 25-50%: +1.0</div>
-            <div>• No Change ~50%: 0.0</div>
-            <div>• Rate Cut 25-50%: -1.0</div>
-            <div>• Rate Cut 50-75%: -1.5</div>
-            <div>• Rate Cut {'>'}75%: -2.0</div>
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border-l-4 border-green-400">
+            <div className="text-sm font-medium text-gray-800 mb-2">📱 Your 5-Minute Weekly Update:</div>
+            <div className="text-xs text-gray-700 space-y-2">
+              <div><strong>USA:</strong> Google "CME FedWatch" (1 min)</div>
+              <div><strong>Europe:</strong> Google "ECB rate expectations" (1 min)</div>
+              <div><strong>UK:</strong> Google "Bank of England rate odds" (1 min)</div>
+              <div><strong>Guidance:</strong> Scan for hawkish/dovish signals (2 min)</div>
+            </div>
           </div>
 
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-lg border-l-4 border-green-400">
-            <div className="text-xs font-medium text-gray-800 mb-2">📱 5-Minute Weekly Update:</div>
-            <div className="text-xs text-gray-600 space-y-1">
-              <div>• CME FedWatch (USD) - 1 minute</div>
-              <div>• ECB Watch tool (EUR) - 1 minute</div>
-              <div>• Scan for guidance changes - 2 minutes</div>
-              <div>• Update probability scores - 1 minute</div>
-            </div>
+          <div className="text-xs text-gray-600 space-y-1 p-3 bg-white rounded border">
+            <div><strong>📈 Hawkish Phrases to Watch:</strong></div>
+            <div>• "may accelerate" • "higher for longer" • "remains committed" • "vigilant"</div>
+            <div><strong>📉 Dovish Phrases to Watch:</strong></div>
+            <div>• "pause to assess" • "data dependent" • "gradual approach" • "nearing peak"</div>
           </div>
         </div>
       </CardContent>
