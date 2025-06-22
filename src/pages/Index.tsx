@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -51,9 +52,15 @@ export interface CurrencyData {
   
   // Risk Appetite (15%)
   gold_sp500_ratio_trend: 'rising' | 'stable' | 'falling';
+  gold_sp500_weekly_performance: number; // Weekly performance difference %
   
   // Money Flow (5%)
   etf_flows: 'major_inflows' | 'normal' | 'major_outflows';
+  uup_flow: number; // USD ETF flow in millions
+  fxe_flow: number; // EUR ETF flow in millions
+  fxb_flow: number; // GBP ETF flow in millions
+  fxa_flow: number; // AUD ETF flow in millions
+  fxc_flow: number; // CAD ETF flow in millions
 }
 
 const Index = () => {
@@ -72,7 +79,13 @@ const Index = () => {
     us_inflation_expectation: 3.2,
     target_inflation_expectation: 2.8,
     gold_sp500_ratio_trend: 'stable',
-    etf_flows: 'normal'
+    gold_sp500_weekly_performance: 0,
+    etf_flows: 'normal',
+    uup_flow: 0,
+    fxe_flow: 0,
+    fxb_flow: 0,
+    fxa_flow: 0,
+    fxc_flow: 0
   });
 
   const [results, setResults] = useState(null);
@@ -285,14 +298,26 @@ const Index = () => {
                 <RiskSentimentInput 
                   vix={data.vix}
                   gold_sp500_ratio_trend={data.gold_sp500_ratio_trend}
+                  gold_sp500_weekly_performance={data.gold_sp500_weekly_performance}
                   onVixChange={(value) => updateData('vix', value)}
                   onGoldRatioChange={(value) => updateData('gold_sp500_ratio_trend', value)}
+                  onGoldWeeklyChange={(value) => updateData('gold_sp500_weekly_performance', value)}
                 />
               </div>
               <div className="animate-scale-in">
                 <FlowDynamicsInput 
                   etf_flows={data.etf_flows}
+                  uup_flow={data.uup_flow}
+                  fxe_flow={data.fxe_flow}
+                  fxb_flow={data.fxb_flow}
+                  fxa_flow={data.fxa_flow}
+                  fxc_flow={data.fxc_flow}
                   onFlowsChange={(value) => updateData('etf_flows', value)}
+                  onUupFlowChange={(value) => updateData('uup_flow', value)}
+                  onFxeFlowChange={(value) => updateData('fxe_flow', value)}
+                  onFxbFlowChange={(value) => updateData('fxb_flow', value)}
+                  onFxaFlowChange={(value) => updateData('fxa_flow', value)}
+                  onFxcFlowChange={(value) => updateData('fxc_flow', value)}
                 />
               </div>
               <Card className="shadow-lg border border-gray-200 dark:border-gray-700 animate-scale-in bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">

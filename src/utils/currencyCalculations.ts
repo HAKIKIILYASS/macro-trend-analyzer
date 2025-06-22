@@ -1,4 +1,3 @@
-
 import { CurrencyData } from '@/pages/Index';
 
 export const calculateCurrencyScore = (data: CurrencyData) => {
@@ -15,10 +14,10 @@ export const calculateCurrencyScore = (data: CurrencyData) => {
   // Factor 3: Real Interest Edge (25% base weight) - Your simplified real rate formula
   const realInterestScore = calculateRealInterestScore(data);
   
-  // Factor 4: Risk Appetite (15% base weight) - Your VIX + Gold vs Stocks method
+  // Factor 4: Risk Appetite (15% base weight) - Your VIX + Gold vs Stocks method with new weekly performance
   const riskAppetiteScore = calculateRiskAppetiteScore(data);
   
-  // Factor 5: Money Flow (5% base weight) - Your ETF flow methodology
+  // Factor 5: Money Flow (5% base weight) - Updated with individual ETF flows
   const moneyFlowScore = calculateMoneyFlowScore(data);
   
   // Apply regime-based weights using your exact weight system
@@ -36,11 +35,11 @@ export const calculateCurrencyScore = (data: CurrencyData) => {
   return {
     regime,
     scores: {
-      rate_expectations: Number(ratePolicyScore.toFixed(2)),
-      real_rate_edge: Number(realInterestScore.toFixed(2)),
-      economic_momentum: Number(growthMomentumScore.toFixed(2)),
-      risk_sentiment: Number(riskAppetiteScore.toFixed(2)),
-      flow_dynamics: Number(moneyFlowScore.toFixed(2)),
+      rate_policy: Number(ratePolicyScore.toFixed(2)),
+      growth_momentum: Number(growthMomentumScore.toFixed(2)),
+      real_interest_edge: Number(realInterestScore.toFixed(2)),
+      risk_appetite: Number(riskAppetiteScore.toFixed(2)),
+      money_flow: Number(moneyFlowScore.toFixed(2)),
     },
     weights: {
       rate: weights.rate,
@@ -180,11 +179,20 @@ const calculateRiskAppetiteScore = (data: CurrencyData): number => {
   
   const vixComponent = vixScore * 0.7;
   
-  // B. Gold vs Stocks (30% of factor) - Your approach
+  // B. Gold vs Stocks (30% of factor) - Updated to use weekly performance data
   let goldStocksScore = 0;
-  if (data.gold_sp500_ratio_trend === 'rising') goldStocksScore = -0.5;  // People scared
-  else if (data.gold_sp500_ratio_trend === 'falling') goldStocksScore = 0.5; // People greedy
-  // 'stable' = 0.0 (Normal)
+  
+  // Use weekly performance if available, otherwise fall back to trend
+  if (data.gold_sp500_weekly_performance !== undefined && data.gold_sp500_weekly_performance !== 0) {
+    if (data.gold_sp500_weekly_performance > 2) goldStocksScore = -0.5;  // Gold outperforming significantly
+    else if (data.gold_sp500_weekly_performance < -2) goldStocksScore = 0.5; // S&P outperforming significantly
+    // Between -2% and +2% = neutral (0.0)
+  } else {
+    // Fall back to trend-based scoring
+    if (data.gold_sp500_ratio_trend === 'rising') goldStocksScore = -0.5;  // People scared
+    else if (data.gold_sp500_ratio_trend === 'falling') goldStocksScore = 0.5; // People greedy
+    // 'stable' = 0.0 (Normal)
+  }
   
   const goldStocksComponent = goldStocksScore * 0.3;
   
@@ -193,13 +201,54 @@ const calculateRiskAppetiteScore = (data: CurrencyData): number => {
 };
 
 const calculateMoneyFlowScore = (data: CurrencyData): number => {
-  // Your ETF Flow methodology - simplified scoring
-  let flowScore = 0;
-  if (data.etf_flows === 'major_inflows') flowScore = 0.5;    // Big money in
-  else if (data.etf_flows === 'major_outflows') flowScore = -0.5; // Big money out
-  // 'normal' = 0.0 (Normal activity)
+  // Updated Money Flow methodology using individual ETF flows
+  let totalFlowScore = 0;
+  let flowCount = 0;
   
-  return Math.max(-0.5, Math.min(0.5, flowScore));
+  // UUP (USD) - Threshold: $500M
+  if (Math.abs(data.uup_flow) >= 500) {
+    totalFlowScore += data.uup_flow > 0 ? 0.5 : -0.5;
+    flowCount++;
+  }
+  
+  // FXE (EUR) - Threshold: $200M  
+  if (Math.abs(data.fxe_flow) >= 200) {
+    totalFlowScore += data.fxe_flow > 0 ? 0.5 : -0.5;
+    flowCount++;
+  }
+  
+  // FXB (GBP) - Threshold: $100M
+  if (Math.abs(data.fxb_flow) >= 100) {
+    totalFlowScore += data.fxb_flow > 0 ? 0.5 : -0.5;
+    flowCount++;
+  }
+  
+  // FXA (AUD) - Threshold: $100M
+  if (Math.abs(data.fxa_flow) >= 100) {
+    totalFlowScore += data.fxa_flow > 0 ? 0.5 : -0.5;
+    flowCount++;
+  }
+  
+  // FXC (CAD) - Threshold: $50M
+  if (Math.abs(data.fxc_flow) >= 50) {
+    totalFlowScore += data.fxc_flow > 0 ? 0.5 : -0.5;
+    flowCount++;
+  }
+  
+  // Average the flow scores if we have multiple significant flows
+  let averageFlowScore = 0;
+  if (flowCount > 0) {
+    averageFlowScore = totalFlowScore / flowCount;
+  }
+  
+  // Fall back to general ETF flow assessment if no specific flows are significant
+  if (flowCount === 0) {
+    if (data.etf_flows === 'major_inflows') averageFlowScore = 0.5;
+    else if (data.etf_flows === 'major_outflows') averageFlowScore = -0.5;
+    // 'normal' = 0.0
+  }
+  
+  return Math.max(-0.5, Math.min(0.5, averageFlowScore));
 };
 
 const getTradingBias = (totalScore: number) => {
