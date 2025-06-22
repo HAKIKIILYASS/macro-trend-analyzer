@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,6 +11,7 @@ import EconomicMomentumInput from '@/components/EconomicMomentumInput';
 import RiskSentimentInput from '@/components/RiskSentimentInput';
 import FlowDynamicsInput from '@/components/FlowDynamicsInput';
 import RegimeDetectionInput from '@/components/RegimeDetectionInput';
+import CurrencyPairSelector, { CurrencyPair } from '@/components/CurrencyPairSelector';
 import MacroResults from '@/components/MacroResults';
 import DataVisualization from '@/components/DataVisualization';
 import ExportData from '@/components/ExportData';
@@ -29,63 +29,74 @@ import ScoreCompare from "@/components/ScoreCompare";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
 export interface CurrencyData {
+  // Currency Pair Selection
+  selectedPair: CurrencyPair;
+  
   // Regime Detection
   vix: number;
-  gold_vs_stocks_monthly: number; // Monthly performance difference %
+  gold_vs_stocks_monthly: number;
   sp500_new_highs: boolean;
   is_cb_week: boolean;
   
-  // Rate Policy (30%)
-  rate_hike_probability: number; // 0-100%
-  rate_cut_probability: number; // 0-100%
-  guidance_shift: 'hawkish' | 'neutral' | 'dovish';
+  // Rate Policy (30%) - Now supports dual currency
+  base_currency_rate_hike_probability: number;
+  base_currency_rate_cut_probability: number;
+  base_currency_guidance_shift: 'hawkish' | 'neutral' | 'dovish';
+  quote_currency_rate_hike_probability: number;
+  quote_currency_rate_cut_probability: number;
+  quote_currency_guidance_shift: 'hawkish' | 'neutral' | 'dovish';
   
-  // Growth Momentum (25%)
-  employment_health: number; // Strong(+1.0), Normal(0.0), Weak(-1.0)
-  pmi: number;
+  // Growth Momentum (25%) - Now supports dual currency
+  base_currency_employment_health: number;
+  base_currency_pmi: number;
+  quote_currency_employment_health: number;
+  quote_currency_pmi: number;
   
-  // Real Interest Edge (25%)
-  us_2y_yield: number;
-  target_2y_yield: number;
-  us_inflation_expectation: number;
-  target_inflation_expectation: number;
+  // Real Interest Edge (25%) - Now supports dual currency
+  base_currency_2y_yield: number;
+  base_currency_inflation_expectation: number;
+  quote_currency_2y_yield: number;
+  quote_currency_inflation_expectation: number;
   
-  // Risk Appetite (15%)
+  // Risk Appetite (15%) - Shared between currencies
   gold_sp500_ratio_trend: 'rising' | 'stable' | 'falling';
-  gold_sp500_weekly_performance: number; // Weekly performance difference %
+  gold_sp500_weekly_performance: number;
   
-  // Money Flow (5%)
+  // Money Flow (5%) - Pair-specific
+  relevant_etf_flows: {
+    [key: string]: number;
+  };
   etf_flows: 'major_inflows' | 'normal' | 'major_outflows';
-  uup_flow: number; // USD ETF flow in millions
-  fxe_flow: number; // EUR ETF flow in millions
-  fxb_flow: number; // GBP ETF flow in millions
-  fxa_flow: number; // AUD ETF flow in millions
-  fxc_flow: number; // CAD ETF flow in millions
 }
 
 const Index = () => {
   const [data, setData] = useState<CurrencyData>({
+    selectedPair: 'EUR/USD',
     vix: 20,
     gold_vs_stocks_monthly: 0,
     sp500_new_highs: false,
     is_cb_week: false,
-    rate_hike_probability: 50,
-    rate_cut_probability: 25,
-    guidance_shift: 'neutral',
-    employment_health: 0,
-    pmi: 50,
-    us_2y_yield: 4.5,
-    target_2y_yield: 3.5,
-    us_inflation_expectation: 3.2,
-    target_inflation_expectation: 2.8,
+    base_currency_rate_hike_probability: 50,
+    base_currency_rate_cut_probability: 25,
+    base_currency_guidance_shift: 'neutral',
+    quote_currency_rate_hike_probability: 50,
+    quote_currency_rate_cut_probability: 25,
+    quote_currency_guidance_shift: 'neutral',
+    base_currency_employment_health: 0,
+    base_currency_pmi: 50,
+    quote_currency_employment_health: 0,
+    quote_currency_pmi: 50,
+    base_currency_2y_yield: 3.5,
+    base_currency_inflation_expectation: 2.8,
+    quote_currency_2y_yield: 4.5,
+    quote_currency_inflation_expectation: 3.2,
     gold_sp500_ratio_trend: 'stable',
     gold_sp500_weekly_performance: 0,
-    etf_flows: 'normal',
-    uup_flow: 0,
-    fxe_flow: 0,
-    fxb_flow: 0,
-    fxa_flow: 0,
-    fxc_flow: 0
+    relevant_etf_flows: {
+      FXE: 0, // EUR
+      UUP: 0, // USD
+    },
+    etf_flows: 'normal'
   });
 
   const [results, setResults] = useState(null);
@@ -108,6 +119,31 @@ const Index = () => {
     setData(prev => ({
       ...prev,
       [field]: value
+    }));
+  };
+
+  const handlePairChange = (pair: CurrencyPair) => {
+    // Reset relevant ETF flows when pair changes
+    const getRelevantETFs = (selectedPair: CurrencyPair) => {
+      const etfMap: { [key: string]: string[] } = {
+        'EUR/USD': ['FXE', 'UUP'],
+        'GBP/USD': ['FXB', 'UUP'],
+        'USD/JPY': ['UUP', 'FXY'],
+        'AUD/USD': ['FXA', 'UUP'],
+        'USD/CAD': ['UUP', 'FXC'],
+        'USD/CHF': ['UUP', 'FXF'],
+      };
+      
+      const relevantETFs = etfMap[selectedPair] || ['UUP'];
+      const flows: { [key: string]: number } = {};
+      relevantETFs.forEach(etf => flows[etf] = 0);
+      return flows;
+    };
+
+    setData(prev => ({
+      ...prev,
+      selectedPair: pair,
+      relevant_etf_flows: getRelevantETFs(pair)
     }));
   };
 
@@ -193,6 +229,13 @@ const Index = () => {
     });
   };
 
+  const getCurrencyNames = () => {
+    const [base, quote] = data.selectedPair.split('/');
+    return { base, quote };
+  };
+
+  const { base, quote } = getCurrencyNames();
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-50 via-blue-50/30 to-green-50/30 dark:from-gray-900 dark:via-blue-950/20 dark:to-green-950/20 transition-all duration-500">
@@ -237,6 +280,12 @@ const Index = () => {
               <ServerStatus />
             </div>
 
+            {/* Currency Pair Selector */}
+            <CurrencyPairSelector 
+              selectedPair={data.selectedPair}
+              onPairChange={handlePairChange}
+            />
+
             <ScoreCompare scoreA={compareA} scoreB={compareB} onClearComparison={clearComparison} />
 
             {results && (
@@ -259,40 +308,10 @@ const Index = () => {
               />
             </div>
 
-            {/* Input cards - Updated 5-factor model */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-              <div className="h-full animate-fade-in">
-                <RateExpectationsInput 
-                  rate_hike_probability={data.rate_hike_probability}
-                  rate_cut_probability={data.rate_cut_probability}
-                  guidance_shift={data.guidance_shift}
-                  onHikeProbabilityChange={(value) => updateData('rate_hike_probability', value)}
-                  onCutProbabilityChange={(value) => updateData('rate_cut_probability', value)}
-                  onGuidanceChange={(value) => updateData('guidance_shift', value)}
-                />
-              </div>
-              <div className="h-full animate-fade-in">
-                <RealRateEdgeInput 
-                  us_2y_yield={data.us_2y_yield}
-                  target_2y_yield={data.target_2y_yield}
-                  us_inflation_expectation={data.us_inflation_expectation}
-                  target_inflation_expectation={data.target_inflation_expectation}
-                  onUsYieldChange={(value) => updateData('us_2y_yield', value)}
-                  onTargetYieldChange={(value) => updateData('target_2y_yield', value)}
-                  onUsInflationChange={(value) => updateData('us_inflation_expectation', value)}
-                  onTargetInflationChange={(value) => updateData('target_inflation_expectation', value)}
-                />
-              </div>
-              <div className="h-full animate-fade-in">
-                <EconomicMomentumInput 
-                  employment_health={data.employment_health}
-                  pmi={data.pmi}
-                  onEmploymentChange={(value) => updateData('employment_health', value)}
-                  onPmiChange={(value) => updateData('pmi', value)}
-                />
-              </div>
-            </div>
+            {/* Note: Rate expectations, Real rate edge, and Economic momentum inputs will need to be updated 
+                 to handle dual currency data in the next phase */}
 
+            {/* Risk Sentiment and Flow Dynamics remain similar but will be updated for pair-specific data */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               <div className="animate-scale-in">
                 <RiskSentimentInput 
@@ -305,20 +324,25 @@ const Index = () => {
                 />
               </div>
               <div className="animate-scale-in">
-                <FlowDynamicsInput 
-                  etf_flows={data.etf_flows}
-                  uup_flow={data.uup_flow}
-                  fxe_flow={data.fxe_flow}
-                  fxb_flow={data.fxb_flow}
-                  fxa_flow={data.fxa_flow}
-                  fxc_flow={data.fxc_flow}
-                  onFlowsChange={(value) => updateData('etf_flows', value)}
-                  onUupFlowChange={(value) => updateData('uup_flow', value)}
-                  onFxeFlowChange={(value) => updateData('fxe_flow', value)}
-                  onFxbFlowChange={(value) => updateData('fxb_flow', value)}
-                  onFxaFlowChange={(value) => updateData('fxa_flow', value)}
-                  onFxcFlowChange={(value) => updateData('fxc_flow', value)}
-                />
+                <Card className="shadow-md hover:shadow-lg transition-shadow border border-gray-200 bg-white">
+                  <CardContent className="p-6">
+                    <div className="text-center space-y-4">
+                      <div className="text-lg font-semibold text-gray-700">
+                        Analyzing: <span className="text-2xl font-bold text-blue-600">{data.selectedPair}</span>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Base Currency: <span className="font-semibold">{base}</span><br/>
+                        Quote Currency: <span className="font-semibold">{quote}</span>
+                      </div>
+                      <div className="bg-blue-50 p-3 rounded-lg">
+                        <div className="text-xs text-gray-700">
+                          Phase 1: Currency pair selection implemented ✓<br/>
+                          Phase 2: Dual currency inputs - Coming next
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
               <Card className="shadow-lg border border-gray-200 dark:border-gray-700 animate-scale-in bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
                 <CardContent className="h-full flex items-center justify-center p-6">
@@ -327,7 +351,7 @@ const Index = () => {
                       onClick={calculateScores} 
                       className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg"
                     >
-                      Calculate Currency Score
+                      Calculate {data.selectedPair} Score
                     </Button>
                     
                     {results && (
