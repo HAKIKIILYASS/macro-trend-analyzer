@@ -1,66 +1,161 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Info, ExternalLink } from 'lucide-react';
+import { Info, ExternalLink, TrendingUp, TrendingDown } from 'lucide-react';
+import { CurrencyPair } from './CurrencyPairSelector';
 
 interface FlowDynamicsInputProps {
+  selectedPair: CurrencyPair;
+  relevant_etf_flows: { [key: string]: number };
   etf_flows: 'major_inflows' | 'normal' | 'major_outflows';
-  uup_flow: number;
-  fxe_flow: number;
-  fxb_flow: number;
-  fxa_flow: number;
-  fxc_flow: number;
+  onRelevantFlowChange: (etf: string, value: number) => void;
   onFlowsChange: (value: 'major_inflows' | 'normal' | 'major_outflows') => void;
-  onUupFlowChange: (value: number) => void;
-  onFxeFlowChange: (value: number) => void;
-  onFxbFlowChange: (value: number) => void;
-  onFxaFlowChange: (value: number) => void;
-  onFxcFlowChange: (value: number) => void;
 }
 
 const FlowDynamicsInput: React.FC<FlowDynamicsInputProps> = ({
+  selectedPair,
+  relevant_etf_flows,
   etf_flows,
-  uup_flow,
-  fxe_flow,
-  fxb_flow,
-  fxa_flow,
-  fxc_flow,
-  onFlowsChange,
-  onUupFlowChange,
-  onFxeFlowChange,
-  onFxbFlowChange,
-  onFxaFlowChange,
-  onFxcFlowChange
+  onRelevantFlowChange,
+  onFlowsChange
 }) => {
-  const getFlowScore = (flow: number, threshold: number) => {
-    if (flow > threshold) return { score: 0.5, label: 'Bullish flows', color: 'text-green-600' };
-    if (flow < -threshold) return { score: -0.5, label: 'Bearish flows', color: 'text-red-600' };
-    return { score: 0.0, label: 'Normal activity', color: 'text-gray-600' };
+  // Define ETF mappings for each currency pair
+  const getETFMapping = (pair: CurrencyPair) => {
+    const etfData: { [key: string]: { etfs: string[], description: string } } = {
+      'EUR/USD': {
+        etfs: ['FXE', 'UUP'],
+        description: 'EUR vs USD institutional flows'
+      },
+      'GBP/USD': {
+        etfs: ['FXB', 'UUP'],
+        description: 'GBP vs USD institutional flows'
+      },
+      'USD/JPY': {
+        etfs: ['UUP', 'FXY'],
+        description: 'USD vs JPY institutional flows'
+      },
+      'AUD/USD': {
+        etfs: ['FXA', 'UUP'],
+        description: 'AUD vs USD institutional flows'
+      },
+      'USD/CAD': {
+        etfs: ['UUP', 'FXC'],
+        description: 'USD vs CAD institutional flows'
+      },
+      'USD/CHF': {
+        etfs: ['UUP', 'FXF'],
+        description: 'USD vs CHF institutional flows'
+      }
+    };
+    return etfData[pair] || { etfs: ['UUP'], description: 'USD institutional flows' };
   };
 
-  const uupInfo = getFlowScore(uup_flow, 500);
-  const fxeInfo = getFlowScore(fxe_flow, 200);
-  const fxbInfo = getFlowScore(fxb_flow, 100);
-  const fxaInfo = getFlowScore(fxa_flow, 100);
-  const fxcInfo = getFlowScore(fxc_flow, 50);
+  const getETFDetails = (etf: string) => {
+    const etfDetails: { [key: string]: { name: string, currency: string, threshold: number, url: string } } = {
+      'UUP': {
+        name: 'Invesco DB US Dollar Index Bullish Fund',
+        currency: 'USD',
+        threshold: 500,
+        url: 'https://finance.yahoo.com/quote/UUP'
+      },
+      'FXE': {
+        name: 'Invesco CurrencyShares Euro Trust',
+        currency: 'EUR',
+        threshold: 200,
+        url: 'https://finance.yahoo.com/quote/FXE'
+      },
+      'FXB': {
+        name: 'Invesco CurrencyShares British Pound Sterling Trust',
+        currency: 'GBP',
+        threshold: 100,
+        url: 'https://finance.yahoo.com/quote/FXB'
+      },
+      'FXA': {
+        name: 'Invesco CurrencyShares Australian Dollar Trust',
+        currency: 'AUD',
+        threshold: 100,
+        url: 'https://finance.yahoo.com/quote/FXA'
+      },
+      'FXC': {
+        name: 'Invesco CurrencyShares Canadian Dollar Trust',
+        currency: 'CAD',
+        threshold: 50,
+        url: 'https://finance.yahoo.com/quote/FXC'
+      },
+      'FXF': {
+        name: 'Invesco CurrencyShares Swiss Franc Trust',
+        currency: 'CHF',
+        threshold: 50,
+        url: 'https://finance.yahoo.com/quote/FXF'
+      },
+      'FXY': {
+        name: 'Invesco CurrencyShares Japanese Yen Trust',
+        currency: 'JPY',
+        threshold: 50,
+        url: 'https://finance.yahoo.com/quote/FXY'
+      }
+    };
+    return etfDetails[etf] || { name: etf, currency: 'Unknown', threshold: 100, url: '#' };
+  };
+
+  const getFlowScore = (etf: string, flow: number) => {
+    const details = getETFDetails(etf);
+    const threshold = details.threshold;
+    
+    if (flow > threshold) return { score: 0.5, label: 'Bullish flows', color: 'text-green-600', icon: <TrendingUp className="w-4 h-4" /> };
+    if (flow < -threshold) return { score: -0.5, label: 'Bearish flows', color: 'text-red-600', icon: <TrendingDown className="w-4 h-4" /> };
+    return { score: 0.0, label: 'Normal activity', color: 'text-gray-600', icon: null };
+  };
+
+  const calculateRelativeFlowAdvantage = () => {
+    const mapping = getETFMapping(selectedPair);
+    const [baseCurrency, quoteCurrency] = selectedPair.split('/');
+    
+    let baseFlow = 0;
+    let quoteFlow = 0;
+    
+    mapping.etfs.forEach(etf => {
+      const details = getETFDetails(etf);
+      const flow = relevant_etf_flows[etf] || 0;
+      const flowScore = getFlowScore(etf, flow);
+      
+      if (details.currency === baseCurrency) {
+        baseFlow += flowScore.score;
+      } else if (details.currency === quoteCurrency) {
+        quoteFlow += flowScore.score;
+      }
+    });
+    
+    const advantage = baseFlow - quoteFlow;
+    return {
+      advantage,
+      baseFlow,
+      quoteFlow,
+      interpretation: advantage > 0.25 ? `${baseCurrency} flow advantage` : 
+                     advantage < -0.25 ? `${quoteCurrency} flow advantage` : 
+                     'Balanced flows'
+    };
+  };
+
+  const mapping = getETFMapping(selectedPair);
+  const flowAdvantage = calculateRelativeFlowAdvantage();
 
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-teal-200 bg-gradient-to-br from-white to-teal-50">
       <CardHeader className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-t-lg">
         <CardTitle className="flex items-center gap-3 text-lg font-semibold">
           <span className="text-xl">💸</span>
-          Money Flow (5%)
+          Smart Money Flow (5%) - {selectedPair}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
                 <Info size={16} className="text-teal-200 hover:text-white transition-colors duration-200" />
               </TooltipTrigger>
               <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-600">
-                <p>Follow the Smart Money. Tracks monthly ETF flows to identify institutional positioning changes.</p>
+                <p>Track institutional money flows for {selectedPair}. Only shows relevant ETFs for your selected currency pair.</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -69,147 +164,95 @@ const FlowDynamicsInput: React.FC<FlowDynamicsInputProps> = ({
       <CardContent className="p-6">
         <div className="space-y-6">
           <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400 mb-4">
-            <div className="text-sm font-medium text-gray-800 mb-1">💡 Simple Question:</div>
-            <div className="text-sm text-gray-700">Are big investors buying or selling currency ETFs this month?</div>
+            <div className="text-sm font-medium text-gray-800 mb-1">🎯 Pair-Specific Analysis:</div>
+            <div className="text-sm text-gray-700">{mapping.description}</div>
           </div>
 
+          {/* Relevant ETF Flows */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label htmlFor="uup-flow" className="text-sm font-medium text-gray-700">
-                  UUP (USD ETF) Flow
-                </Label>
-                <div className={`text-xs font-medium ${uupInfo.color}`}>
-                  {uupInfo.score > 0 ? '+' : ''}{uupInfo.score.toFixed(1)}
+            {mapping.etfs.map(etf => {
+              const details = getETFDetails(etf);
+              const flow = relevant_etf_flows[etf] || 0;
+              const flowInfo = getFlowScore(etf, flow);
+              
+              return (
+                <div key={etf} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor={`${etf}-flow`} className="text-sm font-medium text-gray-700">
+                        {etf} ({details.currency})
+                      </Label>
+                      <a 
+                        href={details.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 hover:text-blue-800"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                    <div className={`flex items-center gap-1 text-xs font-medium ${flowInfo.color}`}>
+                      {flowInfo.icon}
+                      {flowInfo.score > 0 ? '+' : ''}{flowInfo.score.toFixed(1)}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 mb-2">
+                    <Input
+                      id={`${etf}-flow`}
+                      type="number"
+                      value={flow}
+                      onChange={(e) => onRelevantFlowChange(etf, parseFloat(e.target.value) || 0)}
+                      min={-2000}
+                      max={2000}
+                      step={10}
+                      className="text-sm border-teal-300 focus:border-teal-500"
+                    />
+                    <span className="text-xs text-gray-600">$M</span>
+                  </div>
+                  
+                  <div className="text-xs text-gray-600">
+                    <div className="font-medium">{details.name}</div>
+                    <div>Threshold: ±${details.threshold}M ({flowInfo.label})</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Flow Advantage Analysis */}
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-4 rounded-lg border border-teal-200">
+            <div className="text-sm font-semibold text-gray-800 mb-2">📊 Relative Flow Advantage:</div>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-xs text-gray-600">{selectedPair.split('/')[0]} Flows</div>
+                <div className={`text-lg font-bold ${flowAdvantage.baseFlow > 0 ? 'text-green-600' : flowAdvantage.baseFlow < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                  {flowAdvantage.baseFlow > 0 ? '+' : ''}{flowAdvantage.baseFlow.toFixed(1)}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="uup-flow"
-                  type="number"
-                  value={uup_flow}
-                  onChange={(e) => onUupFlowChange(parseFloat(e.target.value) || 0)}
-                  min={-2000}
-                  max={2000}
-                  step={10}
-                  className="text-sm border-teal-300 focus:border-teal-500"
-                />
-                <span className="text-xs text-gray-600">$M</span>
+              <div>
+                <div className="text-xs text-gray-600">Net Advantage</div>
+                <div className={`text-lg font-bold ${flowAdvantage.advantage > 0.25 ? 'text-green-600' : flowAdvantage.advantage < -0.25 ? 'text-red-600' : 'text-gray-600'}`}>
+                  {flowAdvantage.advantage > 0 ? '+' : ''}{flowAdvantage.advantage.toFixed(1)}
+                </div>
               </div>
-              <div className="text-xs text-gray-600 mt-1">
-                Threshold: ±$500M ({uupInfo.label})
+              <div>
+                <div className="text-xs text-gray-600">{selectedPair.split('/')[1]} Flows</div>
+                <div className={`text-lg font-bold ${flowAdvantage.quoteFlow > 0 ? 'text-green-600' : flowAdvantage.quoteFlow < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                  {flowAdvantage.quoteFlow > 0 ? '+' : ''}{flowAdvantage.quoteFlow.toFixed(1)}
+                </div>
               </div>
             </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label htmlFor="fxe-flow" className="text-sm font-medium text-gray-700">
-                  FXE (EUR ETF) Flow
-                </Label>
-                <div className={`text-xs font-medium ${fxeInfo.color}`}>
-                  {fxeInfo.score > 0 ? '+' : ''}{fxeInfo.score.toFixed(1)}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="fxe-flow"
-                  type="number"
-                  value={fxe_flow}
-                  onChange={(e) => onFxeFlowChange(parseFloat(e.target.value) || 0)}
-                  min={-1000}
-                  max={1000}
-                  step={10}
-                  className="text-sm border-teal-300 focus:border-teal-500"
-                />
-                <span className="text-xs text-gray-600">$M</span>
-              </div>
-              <div className="text-xs text-gray-600 mt-1">
-                Threshold: ±$200M ({fxeInfo.label})
-              </div>
+            <div className="text-center mt-2">
+              <span className="text-sm font-medium text-gray-700">{flowAdvantage.interpretation}</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label htmlFor="fxb-flow" className="text-sm font-medium text-gray-700">
-                  FXB (GBP ETF)
-                </Label>
-                <div className={`text-xs font-medium ${fxbInfo.color}`}>
-                  {fxbInfo.score > 0 ? '+' : ''}{fxbInfo.score.toFixed(1)}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="fxb-flow"
-                  type="number"
-                  value={fxb_flow}
-                  onChange={(e) => onFxbFlowChange(parseFloat(e.target.value) || 0)}
-                  min={-500}
-                  max={500}
-                  step={5}
-                  className="text-sm border-teal-300 focus:border-teal-500"
-                />
-                <span className="text-xs text-gray-600">$M</span>
-              </div>
-              <div className="text-xs text-gray-600 mt-1">±$100M</div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label htmlFor="fxa-flow" className="text-sm font-medium text-gray-700">
-                  FXA (AUD ETF)
-                </Label>
-                <div className={`text-xs font-medium ${fxaInfo.color}`}>
-                  {fxaInfo.score > 0 ? '+' : ''}{fxaInfo.score.toFixed(1)}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="fxa-flow"
-                  type="number"
-                  value={fxa_flow}
-                  onChange={(e) => onFxaFlowChange(parseFloat(e.target.value) || 0)}
-                  min={-500}
-                  max={500}
-                  step={5}
-                  className="text-sm border-teal-300 focus:border-teal-500"
-                />
-                <span className="text-xs text-gray-600">$M</span>
-              </div>
-              <div className="text-xs text-gray-600 mt-1">±$100M</div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label htmlFor="fxc-flow" className="text-sm font-medium text-gray-700">
-                  FXC (CAD ETF)
-                </Label>
-                <div className={`text-xs font-medium ${fxcInfo.color}`}>
-                  {fxcInfo.score > 0 ? '+' : ''}{fxcInfo.score.toFixed(1)}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="fxc-flow"
-                  type="number"
-                  value={fxc_flow}
-                  onChange={(e) => onFxcFlowChange(parseFloat(e.target.value) || 0)}
-                  min={-200}
-                  max={200}
-                  step={5}
-                  className="text-sm border-teal-300 focus:border-teal-500"
-                />
-                <span className="text-xs text-gray-600">$M</span>
-              </div>
-              <div className="text-xs text-gray-600 mt-1">±$50M</div>
-            </div>
-          </div>
-
+          {/* Overall Assessment */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <Label htmlFor="etf-flows" className="text-base font-medium text-gray-700">
-                Overall Flow Assessment
+                Overall Flow Assessment (Fallback)
               </Label>
               <a 
                 href="https://www.etf.com" 
@@ -245,25 +288,17 @@ const FlowDynamicsInput: React.FC<FlowDynamicsInputProps> = ({
                 </SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-3 rounded-lg border-l-4 border-teal-400">
-            <div className="text-xs font-medium text-gray-800 mb-2">📊 Scoring System:</div>
-            <div className="text-xs text-gray-600 space-y-1">
-              <div>• <strong>UUP (USD):</strong> {'>'}$500M = +0.5, {'<'}-$500M = -0.5</div>
-              <div>• <strong>FXE (EUR):</strong> {'>'}$200M = +0.5, {'<'}-$200M = -0.5</div>
-              <div>• <strong>FXB/FXA:</strong> {'>'}$100M = +0.5, {'<'}-$100M = -0.5</div>
-              <div>• <strong>FXC (CAD):</strong> {'>'}$50M = +0.5, {'<'}-$50M = -0.5</div>
-              <div>• <strong>Normal range:</strong> 0.0 (Neutral positioning)</div>
+            <div className="text-xs text-gray-600 mt-1">
+              Use this if specific ETF data is unavailable
             </div>
           </div>
 
-          <div className="bg-teal-50 p-3 rounded-lg border border-teal-200">
-            <div className="text-sm font-medium text-gray-800 mb-2">📱 Monthly Data Sources:</div>
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-3 rounded-lg border-l-4 border-teal-400">
+            <div className="text-xs font-medium text-gray-800 mb-2">📱 Monthly Data Sources:</div>
             <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
-              <div>• ETF.com (Flow data)</div>
+              <div>• ETF.com (Primary source)</div>
+              <div>• Yahoo Finance ETF pages</div>
               <div>• ETFdb.com (Alternative)</div>
-              <div>• Yahoo Finance (ETF pages)</div>
               <div>• Morningstar (Fund flows)</div>
             </div>
           </div>

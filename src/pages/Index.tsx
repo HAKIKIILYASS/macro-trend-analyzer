@@ -147,6 +147,16 @@ const Index = () => {
     }));
   };
 
+  const handleRelevantFlowChange = (etf: string, value: number) => {
+    setData(prev => ({
+      ...prev,
+      relevant_etf_flows: {
+        ...prev.relevant_etf_flows,
+        [etf]: value
+      }
+    }));
+  };
+
   const calculateScores = () => {
     const calculatedResults = calculateCurrencyScore(data);
     setResults(calculatedResults);
@@ -335,8 +345,200 @@ const Index = () => {
               />
             </div>
 
-            {/* Risk Sentiment and Flow Dynamics remain similar but will be updated for pair-specific data */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {/* Dual Currency Growth Momentum */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <div className="animate-scale-in">
+                <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-orange-200 bg-gradient-to-br from-white to-orange-50 h-full">
+                  <CardHeader className="bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-t-lg">
+                    <CardTitle className="flex items-center gap-3 text-lg font-semibold">
+                      <span className="text-xl">📈</span>
+                      {base} Growth Momentum (25%)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-base font-medium text-gray-700 mb-2 block">
+                          {base} Employment Health (-1 to +1)
+                        </Label>
+                        <Input
+                          type="number"
+                          value={data.base_currency_employment_health}
+                          onChange={(e) => updateData('base_currency_employment_health', parseFloat(e.target.value) || 0)}
+                          min={-1}
+                          max={1}
+                          step={0.1}
+                          className="text-base border-orange-300 focus:border-orange-500"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-base font-medium text-gray-700 mb-2 block">
+                          {base} Manufacturing PMI
+                        </Label>
+                        <Input
+                          type="number"
+                          value={data.base_currency_pmi}
+                          onChange={(e) => updateData('base_currency_pmi', parseFloat(e.target.value) || 0)}
+                          min={30}
+                          max={70}
+                          step={0.1}
+                          className="text-base border-orange-300 focus:border-orange-500"
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <div className="animate-scale-in">
+                <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-orange-200 bg-gradient-to-br from-white to-orange-50 h-full">
+                  <CardHeader className="bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-t-lg">
+                    <CardTitle className="flex items-center gap-3 text-lg font-semibold">
+                      <span className="text-xl">📈</span>
+                      {quote} Growth Momentum (25%)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-base font-medium text-gray-700 mb-2 block">
+                          {quote} Employment Health (-1 to +1)
+                        </Label>
+                        <Input
+                          type="number"
+                          value={data.quote_currency_employment_health}
+                          onChange={(e) => updateData('quote_currency_employment_health', parseFloat(e.target.value) || 0)}
+                          min={-1}
+                          max={1}
+                          step={0.1}
+                          className="text-base border-orange-300 focus:border-orange-500"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-base font-medium text-gray-700 mb-2 block">
+                          {quote} Manufacturing PMI
+                        </Label>
+                        <Input
+                          type="number"
+                          value={data.quote_currency_pmi}
+                          onChange={(e) => updateData('quote_currency_pmi', parseFloat(e.target.value) || 0)}
+                          min={30}
+                          max={70}
+                          step={0.1}
+                          className="text-base border-orange-300 focus:border-orange-500"
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            {/* Dual Currency Real Rate Edge */}
+            <div className="mb-8 animate-fade-in">
+              <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 border border-blue-200 bg-gradient-to-br from-white to-blue-50">
+                <CardHeader className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-t-lg">
+                  <CardTitle className="flex items-center gap-3 text-lg font-semibold">
+                    <span className="text-xl">🏛️</span>
+                    Real Interest Edge (25%) - {selectedPair}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-800">{base} Data</h4>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          {base} 2Y Government Yield (%)
+                        </Label>
+                        <Input
+                          type="number"
+                          value={data.base_currency_2y_yield}
+                          onChange={(e) => updateData('base_currency_2y_yield', parseFloat(e.target.value) || 0)}
+                          min={-1}
+                          max={10}
+                          step={0.01}
+                          className="text-base border-blue-300 focus:border-blue-500 mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          {base} Inflation Expectation (%)
+                        </Label>
+                        <Input
+                          type="number"
+                          value={data.base_currency_inflation_expectation}
+                          onChange={(e) => updateData('base_currency_inflation_expectation', parseFloat(e.target.value) || 0)}
+                          min={-2}
+                          max={15}
+                          step={0.1}
+                          className="text-base border-blue-300 focus:border-blue-500 mt-1"
+                        />
+                      </div>
+                      <div className="p-2 bg-blue-50 rounded border">
+                        <div className="text-xs text-gray-600">{base} Real Rate:</div>
+                        <div className="text-lg font-bold text-blue-600">
+                          {(data.base_currency_2y_yield - data.base_currency_inflation_expectation).toFixed(2)}%
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-800">{quote} Data</h4>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          {quote} 2Y Government Yield (%)
+                        </Label>
+                        <Input
+                          type="number"
+                          value={data.quote_currency_2y_yield}
+                          onChange={(e) => updateData('quote_currency_2y_yield', parseFloat(e.target.value) || 0)}
+                          min={-1}
+                          max={10}
+                          step={0.01}
+                          className="text-base border-blue-300 focus:border-blue-500 mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          {quote} Inflation Expectation (%)
+                        </Label>
+                        <Input
+                          type="number"
+                          value={data.quote_currency_inflation_expectation}
+                          onChange={(e) => updateData('quote_currency_inflation_expectation', parseFloat(e.target.value) || 0)}
+                          min={-2}
+                          max={15}
+                          step={0.1}
+                          className="text-base border-blue-300 focus:border-blue-500 mt-1"
+                        />
+                      </div>
+                      <div className="p-2 bg-green-50 rounded border">
+                        <div className="text-xs text-gray-600">{quote} Real Rate:</div>
+                        <div className="text-lg font-bold text-green-600">
+                          {(data.quote_currency_2y_yield - data.quote_currency_inflation_expectation).toFixed(2)}%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-semibold text-gray-800">Real Rate Differential:</span>
+                      <span className={`text-xl font-bold ${(data.base_currency_2y_yield - data.base_currency_inflation_expectation) - (data.quote_currency_2y_yield - data.quote_currency_inflation_expectation) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {((data.base_currency_2y_yield - data.base_currency_inflation_expectation) - (data.quote_currency_2y_yield - data.quote_currency_inflation_expectation)) > 0 ? '+' : ''}{((data.base_currency_2y_yield - data.base_currency_inflation_expectation) - (data.quote_currency_2y_yield - data.quote_currency_inflation_expectation)).toFixed(2)}%
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {base} advantage: {((data.base_currency_2y_yield - data.base_currency_inflation_expectation) - (data.quote_currency_2y_yield - data.quote_currency_inflation_expectation)) > 0 ? 'Positive' : 'Negative'}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Risk Sentiment and Enhanced Flow Dynamics */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               <div className="animate-scale-in">
                 <RiskSentimentInput 
                   vix={data.vix}
@@ -346,28 +548,6 @@ const Index = () => {
                   onGoldRatioChange={(value) => updateData('gold_sp500_ratio_trend', value)}
                   onGoldWeeklyChange={(value) => updateData('gold_sp500_weekly_performance', value)}
                 />
-              </div>
-              <div className="animate-scale-in">
-                <Card className="shadow-md hover:shadow-lg transition-shadow border border-gray-200 bg-white">
-                  <CardContent className="p-6">
-                    <div className="text-center space-y-4">
-                      <div className="text-lg font-semibold text-gray-700">
-                        Analyzing: <span className="text-2xl font-bold text-blue-600">{data.selectedPair}</span>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Base Currency: <span className="font-semibold">{base}</span><br/>
-                        Quote Currency: <span className="font-semibold">{quote}</span>
-                      </div>
-                      <div className="bg-blue-50 p-3 rounded-lg">
-                        <div className="text-xs text-gray-700">
-                          Phase 1: Currency pair selection implemented ✓<br/>
-                          Phase 2: Dual currency Rate Policy inputs ✓<br/>
-                          Phase 3: Dual currency Growth/Real Rate - Coming next
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
               <Card className="shadow-lg border border-gray-200 dark:border-gray-700 animate-scale-in bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
                 <CardContent className="h-full flex items-center justify-center p-6">
@@ -389,9 +569,30 @@ const Index = () => {
                         Save Analysis
                       </Button>
                     )}
+                    
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <div className="text-xs text-gray-700">
+                        <div className="font-semibold mb-1">✅ Phase 3 Complete: Enhanced Money Flow</div>
+                        <div>• Pair-specific ETF analysis</div>
+                        <div>• Relative flow advantage calculation</div>
+                        <div>• Simplified interface (only relevant ETFs)</div>
+                        <div>• Smart threshold detection</div>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Enhanced Flow Dynamics - Full Width */}
+            <div className="mb-8 animate-fade-in">
+              <FlowDynamicsInput 
+                selectedPair={data.selectedPair}
+                relevant_etf_flows={data.relevant_etf_flows}
+                etf_flows={data.etf_flows}
+                onRelevantFlowChange={handleRelevantFlowChange}
+                onFlowsChange={(value) => updateData('etf_flows', value)}
+              />
             </div>
 
             {results && (
