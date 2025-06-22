@@ -1,3 +1,4 @@
+
 import { CurrencyData } from '@/pages/Index';
 
 export const calculateCurrencyScore = (data: CurrencyData) => {
@@ -5,41 +6,26 @@ export const calculateCurrencyScore = (data: CurrencyData) => {
   const regime = determineMarketRegime(data);
   const weights = getRegimeWeights(regime);
   
-  // Factor 1: Rate Policy (30% base weight) - Updated to match your exact methodology
-  const ratePolicyScore = calculateRatePolicyScore(data);
+  // Calculate individual currency scores
+  const baseCurrencyScore = calculateIndividualCurrencyScore(data, 'base');
+  const quoteCurrencyScore = calculateIndividualCurrencyScore(data, 'quote');
   
-  // Factor 2: Growth Momentum (25% base weight) - Using your employment + PMI approach
-  const growthMomentumScore = calculateGrowthMomentumScore(data);
+  // Calculate differential score (base - quote)
+  const differentialScore = baseCurrencyScore - quoteCurrencyScore;
   
-  // Factor 3: Real Interest Edge (25% base weight) - Your simplified real rate formula
-  const realInterestScore = calculateRealInterestScore(data);
-  
-  // Factor 4: Risk Appetite (15% base weight) - Your VIX + Gold vs Stocks method with new weekly performance
-  const riskAppetiteScore = calculateRiskAppetiteScore(data);
-  
-  // Factor 5: Money Flow (5% base weight) - Updated with individual ETF flows
-  const moneyFlowScore = calculateMoneyFlowScore(data);
-  
-  // Apply regime-based weights using your exact weight system
-  const totalScore = (
-    ratePolicyScore * weights.rate +
-    growthMomentumScore * weights.momentum +
-    realInterestScore * weights.realRate +
-    riskAppetiteScore * weights.risk +
-    moneyFlowScore * weights.flow
-  );
-  
-  // Determine trading bias using your exact signal matrix
-  const { bias, biasColor, positionSize, riskPerTrade } = getTradingBias(totalScore);
+  // Determine trading bias using the differential
+  const { bias, biasColor, positionSize, riskPerTrade } = getTradingBias(differentialScore);
   
   return {
     regime,
+    baseCurrencyScore: Number(baseCurrencyScore.toFixed(2)),
+    quoteCurrencyScore: Number(quoteCurrencyScore.toFixed(2)),
     scores: {
-      rate_policy: Number(ratePolicyScore.toFixed(2)),
-      growth_momentum: Number(growthMomentumScore.toFixed(2)),
-      real_interest_edge: Number(realInterestScore.toFixed(2)),
-      risk_appetite: Number(riskAppetiteScore.toFixed(2)),
-      money_flow: Number(moneyFlowScore.toFixed(2)),
+      rate_policy: Number((calculateRatePolicyScore(data, 'base') - calculateRatePolicyScore(data, 'quote')).toFixed(2)),
+      growth_momentum: Number((calculateGrowthMomentumScore(data, 'base') - calculateGrowthMomentumScore(data, 'quote')).toFixed(2)),
+      real_interest_edge: Number(calculateRealInterestScore(data).toFixed(2)),
+      risk_appetite: Number(calculateRiskAppetiteScore(data).toFixed(2)),
+      money_flow: Number(calculateMoneyFlowScore(data).toFixed(2)),
     },
     weights: {
       rate: weights.rate,
@@ -48,13 +34,56 @@ export const calculateCurrencyScore = (data: CurrencyData) => {
       risk: weights.risk,
       flow: weights.flow
     },
-    total_score: Number(totalScore.toFixed(2)),
+    total_score: Number(differentialScore.toFixed(2)),
     bias,
     biasColor,
     positionSize,
     riskPerTrade,
-    tradingRecommendation: generateTradingRecommendation(totalScore, bias, regime)
+    tradingRecommendation: generateTradingRecommendation(differentialScore, bias, regime)
   };
+};
+
+const calculateIndividualCurrencyScore = (data: CurrencyData, currency: 'base' | 'quote'): number => {
+  const regime = determineMarketRegime(data);
+  const weights = getRegimeWeights(regime);
+  
+  // Factor 1: Rate Policy (30% base weight)
+  const ratePolicyScore = calculateRatePolicyScore(data, currency);
+  
+  // Factor 2: Growth Momentum (25% base weight)
+  const growthMomentumScore = calculateGrowthMomentumScore(data, currency);
+  
+  // Factor 3: Real Interest Edge (25% base weight) - calculated as differential
+  const realInterestScore = currency === 'base' ? calculateRealInterestScore(data) / 2 : -calculateRealInterestScore(data) / 2;
+  
+  // Factor 4: Risk Appetite (15% base weight) - shared, adjusted by currency type
+  const riskAppetiteScore = calculateRiskAppetiteScore(data) * getCurrencyRiskMultiplier(data.selectedPair, currency);
+  
+  // Factor 5: Money Flow (5% base weight) - pair-specific
+  const moneyFlowScore = calculateMoneyFlowScore(data) * (currency === 'base' ? 1 : -1);
+  
+  // Apply regime-based weights
+  const totalScore = (
+    ratePolicyScore * weights.rate +
+    growthMomentumScore * weights.momentum +
+    realInterestScore * weights.realRate +
+    riskAppetiteScore * weights.risk +
+    moneyFlowScore * weights.flow
+  );
+  
+  return totalScore;
+};
+
+const getCurrencyRiskMultiplier = (pair: string, currency: 'base' | 'quote'): number => {
+  const riskOnCurrencies = ['AUD', 'NZD', 'CAD'];
+  const safeHavenCurrencies = ['USD', 'JPY', 'CHF'];
+  
+  const [base, quote] = pair.split('/');
+  const targetCurrency = currency === 'base' ? base : quote;
+  
+  if (riskOnCurrencies.includes(targetCurrency)) return 1.0; // Full risk appetite impact
+  if (safeHavenCurrencies.includes(targetCurrency)) return -1.0; // Inverse risk appetite impact
+  return 0.5; // Partial impact for neutral currencies like EUR, GBP
 };
 
 const determineMarketRegime = (data: CurrencyData): string => {
@@ -112,24 +141,33 @@ const getRegimeWeights = (regime: string) => {
   }
 };
 
-const calculateRatePolicyScore = (data: CurrencyData): number => {
-  // A. Next Meeting Probability (70% of factor) - Your exact thresholds
+const calculateRatePolicyScore = (data: CurrencyData, currency: 'base' | 'quote'): number => {
+  const rateData = currency === 'base' ? {
+    rate_hike_probability: data.base_currency_rate_hike_probability,
+    rate_cut_probability: data.base_currency_rate_cut_probability,
+    guidance_shift: data.base_currency_guidance_shift
+  } : {
+    rate_hike_probability: data.quote_currency_rate_hike_probability,
+    rate_cut_probability: data.quote_currency_rate_cut_probability,
+    guidance_shift: data.quote_currency_guidance_shift
+  };
+
+  // A. Next Meeting Probability (70% of factor)
   let meetingScore = 0;
-  if (data.rate_hike_probability > 75) meetingScore = 2.0;        // Rate Hike >75%
-  else if (data.rate_hike_probability >= 50) meetingScore = 1.5;  // Rate Hike 50-75%
-  else if (data.rate_hike_probability >= 25) meetingScore = 1.0;  // Rate Hike 25-50%
-  else if (data.rate_cut_probability >= 25 && data.rate_cut_probability < 50) meetingScore = -1.0;  // Rate Cut 25-50%
-  else if (data.rate_cut_probability >= 50 && data.rate_cut_probability < 75) meetingScore = -1.5;  // Rate Cut 50-75%
-  else if (data.rate_cut_probability > 75) meetingScore = -2.0;   // Rate Cut >75%
-  else meetingScore = 0.0; // No change expected around 50%
+  if (rateData.rate_hike_probability > 75) meetingScore = 2.0;
+  else if (rateData.rate_hike_probability >= 50) meetingScore = 1.5;
+  else if (rateData.rate_hike_probability >= 25) meetingScore = 1.0;
+  else if (rateData.rate_cut_probability >= 25 && rateData.rate_cut_probability < 50) meetingScore = -1.0;
+  else if (rateData.rate_cut_probability >= 50 && rateData.rate_cut_probability < 75) meetingScore = -1.5;
+  else if (rateData.rate_cut_probability > 75) meetingScore = -2.0;
+  else meetingScore = 0.0;
   
   const meetingComponent = meetingScore * 0.7;
   
-  // B. Forward Guidance Shift (30% of factor) - Your exact methodology
+  // B. Forward Guidance Shift (30% of factor)
   let guidanceScore = 0;
-  if (data.guidance_shift === 'hawkish') guidanceScore = 0.5;     // More Hawkish Signals
-  else if (data.guidance_shift === 'dovish') guidanceScore = -0.5; // More Dovish Signals
-  // 'neutral' = 0.0 (Same Tone)
+  if (rateData.guidance_shift === 'hawkish') guidanceScore = 0.5;
+  else if (rateData.guidance_shift === 'dovish') guidanceScore = -0.5;
   
   const guidanceComponent = guidanceScore * 0.3;
   
@@ -137,17 +175,25 @@ const calculateRatePolicyScore = (data: CurrencyData): number => {
   return Math.max(-2.5, Math.min(2.5, totalScore));
 };
 
-const calculateGrowthMomentumScore = (data: CurrencyData): number => {
-  // A. Employment Health (50% of factor) - Your exact approach
-  const employmentComponent = data.employment_health * 0.5; // Strong(+1.0), Normal(0.0), Weak(-1.0)
+const calculateGrowthMomentumScore = (data: CurrencyData, currency: 'base' | 'quote'): number => {
+  const growthData = currency === 'base' ? {
+    employment_health: data.base_currency_employment_health,
+    pmi: data.base_currency_pmi
+  } : {
+    employment_health: data.quote_currency_employment_health,
+    pmi: data.quote_currency_pmi
+  };
+
+  // A. Employment Health (50% of factor)
+  const employmentComponent = growthData.employment_health * 0.5;
   
-  // B. Manufacturing Pulse (50% of factor) - Your exact PMI thresholds
+  // B. Manufacturing Pulse (50% of factor)
   let pmiScore = 0;
-  if (data.pmi > 53) pmiScore = 1.0;        // Strong expansion (booming)
-  else if (data.pmi >= 50) pmiScore = 0.5;  // Mild growth (growing slowly)
-  else if (data.pmi >= 47) pmiScore = 0.0;  // Stagnant
-  else if (data.pmi >= 45) pmiScore = -0.5; // Mild contraction
-  else pmiScore = -1.0;                     // Deep contraction (shrinking)
+  if (growthData.pmi > 53) pmiScore = 1.0;
+  else if (growthData.pmi >= 50) pmiScore = 0.5;
+  else if (growthData.pmi >= 47) pmiScore = 0.0;
+  else if (growthData.pmi >= 45) pmiScore = -0.5;
+  else pmiScore = -1.0;
   
   const pmiComponent = pmiScore * 0.5;
   
@@ -156,12 +202,12 @@ const calculateGrowthMomentumScore = (data: CurrencyData): number => {
 };
 
 const calculateRealInterestScore = (data: CurrencyData): number => {
-  // Your simplified real rate formula: Bond Rate - Inflation Rate
-  const usRealRate = data.us_2y_yield - data.us_inflation_expectation;
-  const targetRealRate = data.target_2y_yield - data.target_inflation_expectation;
+  // Calculate real rates for both currencies
+  const baseRealRate = data.base_currency_2y_yield - data.base_currency_inflation_expectation;
+  const quoteRealRate = data.quote_currency_2y_yield - data.quote_currency_inflation_expectation;
   
-  // Score = Difference × 2 (your multiplier)
-  const differential = targetRealRate - usRealRate;
+  // Score = Difference × 2
+  const differential = baseRealRate - quoteRealRate;
   const score = differential * 2;
   
   // Maximum Score: ±3.0
@@ -169,29 +215,25 @@ const calculateRealInterestScore = (data: CurrencyData): number => {
 };
 
 const calculateRiskAppetiteScore = (data: CurrencyData): number => {
-  // A. Fear Index (70% of factor) - Your exact VIX thresholds
+  // A. Fear Index (70% of factor)
   let vixScore = 0;
-  if (data.vix < 15) vixScore = 1.5;        // Everyone's greedy = Risk currencies win
-  else if (data.vix <= 20) vixScore = 0.5;  // Pretty calm
-  else if (data.vix <= 25) vixScore = 0.0;  // Normal volatility
-  else if (data.vix <= 30) vixScore = -1.0; // Getting worried
-  else vixScore = -1.5;                     // Panic mode = Safe havens win
+  if (data.vix < 15) vixScore = 1.5;
+  else if (data.vix <= 20) vixScore = 0.5;
+  else if (data.vix <= 25) vixScore = 0.0;
+  else if (data.vix <= 30) vixScore = -1.0;
+  else vixScore = -1.5;
   
   const vixComponent = vixScore * 0.7;
   
-  // B. Gold vs Stocks (30% of factor) - Updated to use weekly performance data
+  // B. Gold vs Stocks (30% of factor)
   let goldStocksScore = 0;
   
-  // Use weekly performance if available, otherwise fall back to trend
   if (data.gold_sp500_weekly_performance !== undefined && data.gold_sp500_weekly_performance !== 0) {
-    if (data.gold_sp500_weekly_performance > 2) goldStocksScore = -0.5;  // Gold outperforming significantly
-    else if (data.gold_sp500_weekly_performance < -2) goldStocksScore = 0.5; // S&P outperforming significantly
-    // Between -2% and +2% = neutral (0.0)
+    if (data.gold_sp500_weekly_performance > 2) goldStocksScore = -0.5;
+    else if (data.gold_sp500_weekly_performance < -2) goldStocksScore = 0.5;
   } else {
-    // Fall back to trend-based scoring
-    if (data.gold_sp500_ratio_trend === 'rising') goldStocksScore = -0.5;  // People scared
-    else if (data.gold_sp500_ratio_trend === 'falling') goldStocksScore = 0.5; // People greedy
-    // 'stable' = 0.0 (Normal)
+    if (data.gold_sp500_ratio_trend === 'rising') goldStocksScore = -0.5;
+    else if (data.gold_sp500_ratio_trend === 'falling') goldStocksScore = 0.5;
   }
   
   const goldStocksComponent = goldStocksScore * 0.3;
@@ -201,58 +243,44 @@ const calculateRiskAppetiteScore = (data: CurrencyData): number => {
 };
 
 const calculateMoneyFlowScore = (data: CurrencyData): number => {
-  // Updated Money Flow methodology using individual ETF flows
+  // Use relevant ETF flows for the selected pair
   let totalFlowScore = 0;
   let flowCount = 0;
   
-  // UUP (USD) - Threshold: $500M
-  if (Math.abs(data.uup_flow) >= 500) {
-    totalFlowScore += data.uup_flow > 0 ? 0.5 : -0.5;
-    flowCount++;
-  }
+  Object.entries(data.relevant_etf_flows).forEach(([etf, flow]) => {
+    const threshold = getETFThreshold(etf);
+    if (Math.abs(flow) >= threshold) {
+      totalFlowScore += flow > 0 ? 0.5 : -0.5;
+      flowCount++;
+    }
+  });
   
-  // FXE (EUR) - Threshold: $200M  
-  if (Math.abs(data.fxe_flow) >= 200) {
-    totalFlowScore += data.fxe_flow > 0 ? 0.5 : -0.5;
-    flowCount++;
-  }
-  
-  // FXB (GBP) - Threshold: $100M
-  if (Math.abs(data.fxb_flow) >= 100) {
-    totalFlowScore += data.fxb_flow > 0 ? 0.5 : -0.5;
-    flowCount++;
-  }
-  
-  // FXA (AUD) - Threshold: $100M
-  if (Math.abs(data.fxa_flow) >= 100) {
-    totalFlowScore += data.fxa_flow > 0 ? 0.5 : -0.5;
-    flowCount++;
-  }
-  
-  // FXC (CAD) - Threshold: $50M
-  if (Math.abs(data.fxc_flow) >= 50) {
-    totalFlowScore += data.fxc_flow > 0 ? 0.5 : -0.5;
-    flowCount++;
-  }
-  
-  // Average the flow scores if we have multiple significant flows
   let averageFlowScore = 0;
   if (flowCount > 0) {
     averageFlowScore = totalFlowScore / flowCount;
-  }
-  
-  // Fall back to general ETF flow assessment if no specific flows are significant
-  if (flowCount === 0) {
+  } else {
+    // Fall back to general assessment
     if (data.etf_flows === 'major_inflows') averageFlowScore = 0.5;
     else if (data.etf_flows === 'major_outflows') averageFlowScore = -0.5;
-    // 'normal' = 0.0
   }
   
   return Math.max(-0.5, Math.min(0.5, averageFlowScore));
 };
 
+const getETFThreshold = (etf: string): number => {
+  const thresholds: { [key: string]: number } = {
+    'UUP': 500,  // USD
+    'FXE': 200,  // EUR
+    'FXB': 100,  // GBP
+    'FXA': 100,  // AUD
+    'FXC': 50,   // CAD
+    'FXF': 50,   // CHF
+    'FXY': 50    // JPY
+  };
+  return thresholds[etf] || 100;
+};
+
 const getTradingBias = (totalScore: number) => {
-  // Your exact Trading Signal Matrix
   if (totalScore > 1.8) {
     return {
       bias: 'Very Strong Bullish',

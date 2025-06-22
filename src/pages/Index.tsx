@@ -38,7 +38,7 @@ export interface CurrencyData {
   sp500_new_highs: boolean;
   is_cb_week: boolean;
   
-  // Rate Policy (30%) - Now supports dual currency
+  // Rate Policy (30%) - Updated for dual currency support
   base_currency_rate_hike_probability: number;
   base_currency_rate_cut_probability: number;
   base_currency_guidance_shift: 'hawkish' | 'neutral' | 'dovish';
@@ -46,13 +46,13 @@ export interface CurrencyData {
   quote_currency_rate_cut_probability: number;
   quote_currency_guidance_shift: 'hawkish' | 'neutral' | 'dovish';
   
-  // Growth Momentum (25%) - Now supports dual currency
+  // Growth Momentum (25%) - Updated for dual currency support
   base_currency_employment_health: number;
   base_currency_pmi: number;
   quote_currency_employment_health: number;
   quote_currency_pmi: number;
   
-  // Real Interest Edge (25%) - Now supports dual currency
+  // Real Interest Edge (25%) - Updated for dual currency support
   base_currency_2y_yield: number;
   base_currency_inflation_expectation: number;
   quote_currency_2y_yield: number;
@@ -308,8 +308,32 @@ const Index = () => {
               />
             </div>
 
-            {/* Note: Rate expectations, Real rate edge, and Economic momentum inputs will need to be updated 
-                 to handle dual currency data in the next phase */}
+            {/* Dual Currency Rate Policy */}
+            <div className="mb-8 animate-fade-in">
+              <RateExpectationsInput 
+                selectedPair={data.selectedPair}
+                baseCurrencyData={{
+                  rate_hike_probability: data.base_currency_rate_hike_probability,
+                  rate_cut_probability: data.base_currency_rate_cut_probability,
+                  guidance_shift: data.base_currency_guidance_shift
+                }}
+                quoteCurrencyData={{
+                  rate_hike_probability: data.quote_currency_rate_hike_probability,
+                  rate_cut_probability: data.quote_currency_rate_cut_probability,
+                  guidance_shift: data.quote_currency_guidance_shift
+                }}
+                onBaseCurrencyChange={(field, value) => {
+                  if (field === 'rate_hike_probability') updateData('base_currency_rate_hike_probability', value);
+                  if (field === 'rate_cut_probability') updateData('base_currency_rate_cut_probability', value);
+                  if (field === 'guidance_shift') updateData('base_currency_guidance_shift', value);
+                }}
+                onQuoteCurrencyChange={(field, value) => {
+                  if (field === 'rate_hike_probability') updateData('quote_currency_rate_hike_probability', value);
+                  if (field === 'rate_cut_probability') updateData('quote_currency_rate_cut_probability', value);
+                  if (field === 'guidance_shift') updateData('quote_currency_guidance_shift', value);
+                }}
+              />
+            </div>
 
             {/* Risk Sentiment and Flow Dynamics remain similar but will be updated for pair-specific data */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -337,7 +361,8 @@ const Index = () => {
                       <div className="bg-blue-50 p-3 rounded-lg">
                         <div className="text-xs text-gray-700">
                           Phase 1: Currency pair selection implemented ✓<br/>
-                          Phase 2: Dual currency inputs - Coming next
+                          Phase 2: Dual currency Rate Policy inputs ✓<br/>
+                          Phase 3: Dual currency Growth/Real Rate - Coming next
                         </div>
                       </div>
                     </div>
